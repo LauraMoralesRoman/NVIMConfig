@@ -45,3 +45,9 @@ vim.api.nvim_create_user_command('ToggleEditorGuides', function()
 end, {
     desc = 'Toggle 80-col guide plus textwidth/formatoptions',
 })
+
+vim.api.nvim_create_user_command('ApplyAuraHighlightChanges', function()
+    require 'highlight'
+end, {
+    desc = 'Apply the custom highlightings to fix the aura-theme'
+})
