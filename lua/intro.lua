@@ -9,7 +9,7 @@ local float_win, float_buf
 local function show_centered_intro()
     -- 1. Your intro text
     local lines  = {
-        "     󰄛  CatNVIM  󰄛",
+        "    󰄛  CatNVIM  󰄛",
         "By Laura Morales Román",
     }
 
