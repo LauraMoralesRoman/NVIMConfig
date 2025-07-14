@@ -12,10 +12,23 @@ return {
         'junegunn/fzf.vim',
         dependencies = { 'junegunn/fzf' },
         keys = {
-            { '<Leader><Leader>', '<cmd>Files<cr>',   desc = 'Find files' },
-            { '<Leader>,',        '<cmd>Buffers<cr>', desc = 'Find buffers' },
-            { '<Leader>/',        '<cmd>Rg<cr>',      desc = 'Search project' },
+            { '<Leader><Leader>', '<cmd>FzfLua files<cr>',                       desc = 'Find files' },
+            { '<Leader>,',        '<cmd>FzfLua buffers<cr>',                     desc = 'Find buffers' },
+            { '<Leader>/',        '<cmd>FzfLua live_grep<cr>',                   desc = 'Search project' },
+            { '<Leader>lw',       '<cmd>FzfLua lsp_workspace_symbols<cr>',       desc = 'Search project' },
+            { '<Leader>ls',       '<cmd>FzfLua lsp_document_symbols<cr>',        desc = 'Search project' },
+            { '<Leader>lh',       '<cmd>FzfLua LspClangdSwitchSourceHeader<cr>', desc = 'Search project' },
+            { '<Leader>lu',       '<cmd>FzfLua live_finder<cr>',                 desc = 'Search project' },
         },
+        config = function()
+            require 'fzf-lua'.setup {
+                keymap = {
+                    fzf = {
+                        ['ctrl-q'] = 'select-all+accept',
+                    },
+                },
+            }
+        end
     },
     {
         'NeogitOrg/neogit',
@@ -42,5 +55,32 @@ return {
         'windwp/nvim-autopairs',
         event = "InsertEnter",
         config = true
+    },
+    {
+        "stevearc/dressing.nvim",
+        opts = {
+            select = {
+                -- put fzf_lua first so dressing.nvim picks it for vim.ui.select()
+                backend = { "fzf_lua", "fzf", "builtin" },
+                -- (optional) pass any fzf-lua-specific window opts here:
+                fzf_lua = {
+                    winopts = {
+                        height = 0.4,
+                        width  = 0.5,
+                    },
+                },
+            },
+        },
+    },
+    {
+        "ziontee113/icon-picker.nvim",
+        config = function()
+            require("icon-picker").setup({ disable_legacy_commands = true })
+        end,
+        commands = {
+            'IconPickerInsert',
+            'IconPickerNormal',
+            'IconPickerYank'
+        }
     }
 }

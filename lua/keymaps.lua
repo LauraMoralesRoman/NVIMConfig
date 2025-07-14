@@ -41,9 +41,8 @@ vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true }) -- Exit termi
 vim.keymap.set('n', '<Leader>t', '<cmd>Lspsaga term_toggle<cr>')
 
 -- LSP
-vim.keymap.set('n', '<Leader>lw', function()
-    vim.lsp.buf.workspace_symbol()
-end, { desc = 'List workspace symbols' })
+vim.keymap.set('n', '<Leader>n', '<cmd>cnext<cr>')
+vim.keymap.set('n', '<Leader>p', '<cmd>cprevious<cr>')
 
 -- Show all symbols in the current buffer, listed in quickfix
 vim.keymap.set('n', '<Leader>ls', function()

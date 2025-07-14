@@ -48,3 +48,12 @@ if vim.g.neovide then
 end
 
 vim.env.FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow'
+
+vim.opt.statusline = table.concat({
+    'Laura Morales 󰄛 ',
+    '%f',                                          -- file path
+    '%m',                                          -- modified flag
+    '%=',                                          -- right-align
+    '%{v:lua.require("lsp-progress").progress()}', -- ✨ LSP progress
+    '%l:%c %p%%',                                  -- line:col and percent through file
+}, ' ')
