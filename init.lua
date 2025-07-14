@@ -22,3 +22,5 @@ require 'autocmds'
 require 'functions'
 
 vim.cmd [[colorscheme industry]]
+
+require 'intro'
