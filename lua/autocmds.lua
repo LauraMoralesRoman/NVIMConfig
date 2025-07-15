@@ -53,3 +53,8 @@ vim.api.nvim_create_autocmd('BufWritePost', {
         vim.cmd('silent! helptags ' .. vim.fn.fnameescape(doc_dir))
     end,
 })
+
+-- Update the status bar when the LSP information changes
+vim.api.nvim_create_autocmd("LspProgress", {
+    callback = function() vim.cmd("redrawstatus") end,
+})
