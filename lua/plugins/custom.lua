@@ -12,13 +12,13 @@ return {
         'junegunn/fzf.vim',
         dependencies = { 'junegunn/fzf' },
         keys = {
-            { '<Leader><Leader>', '<cmd>FzfLua files<cr>',                       desc = 'Find files' },
-            { '<Leader>,',        '<cmd>FzfLua buffers<cr>',                     desc = 'Find buffers' },
-            { '<Leader>/',        '<cmd>FzfLua live_grep<cr>',                   desc = 'Search project' },
-            { '<Leader>lw',       '<cmd>FzfLua lsp_workspace_symbols<cr>',       desc = 'Search project' },
-            { '<Leader>ls',       '<cmd>FzfLua lsp_document_symbols<cr>',        desc = 'Search project' },
-            { '<Leader>lh',       '<cmd>FzfLua LspClangdSwitchSourceHeader<cr>', desc = 'Search project' },
-            { '<Leader>lu',       '<cmd>FzfLua live_finder<cr>',                 desc = 'Search project' },
+            { '<Leader><Leader>', '<cmd>FzfLua files<cr>',                 desc = 'Find files' },
+            { '<Leader>,',        '<cmd>FzfLua buffers<cr>',               desc = 'Find buffers' },
+            { '<Leader>/',        '<cmd>FzfLua live_grep<cr>',             desc = 'Search project' },
+            { '<Leader>lw',       '<cmd>FzfLua lsp_workspace_symbols<cr>', desc = 'Search symbols in workspace' },
+            { '<Leader>ls',       '<cmd>FzfLua lsp_document_symbols<cr>',  desc = 'Search symbols in document' },
+            { '<Leader>lh',       '<cmd>LspClangdSwitchSourceHeader<cr>',  desc = 'Switch between source and header' },
+            { '<Leader>lu',       '<cmd>FzfLua lsp_references<cr>',        desc = 'Search references to symbol' },
         },
         config = function()
             require 'fzf-lua'.setup {
@@ -36,8 +36,7 @@ return {
             'nvim-lua/plenary.nvim',  -- required
             'sindrets/diffview.nvim', -- optional - Diff integration
 
-            -- Only one of these is needed, not both.
-            'ibhagwan/fzf-lua', -- optional
+            'ibhagwan/fzf-lua',       -- optional
         },
         config = true,
     },
