@@ -22,6 +22,6 @@ require('lazy').setup {
 require 'autocmds'
 require 'functions'
 
-vim.cmd [[colorscheme industry]]
+vim.cmd [[colorscheme oxocarbon]]
 
 require 'intro'

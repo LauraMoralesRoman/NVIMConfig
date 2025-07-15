@@ -50,7 +50,7 @@ end
 vim.env.FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow'
 
 vim.opt.statusline = table.concat({
-    'Laura Morales 󰄛 ',
+    ' Laura 󰄛 ',
     '%f',                                          -- file path
     '%m',                                          -- modified flag
     '%=',                                          -- right-align

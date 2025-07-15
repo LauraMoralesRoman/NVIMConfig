@@ -1,13 +1,5 @@
 return {
-    {
-        'baliestri/aura-theme',
-        lazy = false,
-        priority = 1000,
-        config = function(plugin)
-            vim.opt.rtp:append(plugin.dir .. '/packages/neovim')
-            -- vim.cmd [[colorscheme aura-dark-soft-text]]
-        end,
-    },
+    "nyoom-engineering/oxocarbon.nvim",
     {
         'junegunn/fzf.vim',
         dependencies = { 'junegunn/fzf' },
