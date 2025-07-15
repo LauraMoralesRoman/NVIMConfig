@@ -58,3 +58,36 @@ vim.opt.statusline = table.concat({
     '%{v:lua.require("lsp-progress").progress()}', -- ✨ LSP progress
     '%l:%c %p%%',                                  -- line:col and percent through file
 }, ' ')
+
+local signs = {
+    { name = "DiagnosticSignError", text = "" },
+    { name = "DiagnosticSignWarn", text = "" },
+    { name = "DiagnosticSignInfo", text = "󰋼" },
+    { name = "DiagnosticSignHint", text = "" },
+}
+
+for _, sign in ipairs(signs) do
+    vim.fn.sign_define(sign.name, {
+        texthl = sign.name,
+        text   = sign.text,
+        numhl  = ""
+    })
+end
+
+vim.diagnostic.config({
+    virtual_text = {
+        prefix = function(diagnostic)
+            local sev = diagnostic.severity
+            if sev == vim.diagnostic.severity.ERROR then
+                return " " -- Error icon
+            elseif sev == vim.diagnostic.severity.WARN then
+                return " " -- Warning icon
+            elseif sev == vim.diagnostic.severity.INFO then
+                return " " -- Info icon
+            elseif sev == vim.diagnostic.severity.HINT then
+                return " " -- Hint icon
+            end
+            return "" -- Fallback: no prefix
+        end,
+    }
+})
