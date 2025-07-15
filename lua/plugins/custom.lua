@@ -73,5 +73,9 @@ return {
             'IconPickerNormal',
             'IconPickerYank'
         }
+    },
+    {
+        'lewis6991/gitsigns.nvim',
+        dependencies = { 'nvim-lua/plenary.nvim' }
     }
 }
