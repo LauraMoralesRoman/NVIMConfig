@@ -7,6 +7,7 @@ vim.g.maplocalleader = ' '
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = ''
+vim.opt.cmdheight = 0
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
@@ -18,7 +19,7 @@ vim.opt.splitbelow = true
 vim.opt_global.shiftwidth = 4
 vim.opt_global.tabstop = 4
 vim.opt_global.expandtab = true
--- vim.opt_global.wrap = false
+vim.opt.wrap = false
 vim.opt.breakindent = true
 vim.opt.undofile = true
 
