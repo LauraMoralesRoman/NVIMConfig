@@ -4,13 +4,22 @@
 
 -- Keep track of the floating window and buffer
 local float_win, float_buf
+local shown = false
 
 -- Function to show the intro
 local function show_centered_intro()
+    if shown then
+        print('Already shown')
+        return
+    end
+
+    shown        = true
     -- 1. Your intro text
     local lines  = {
-        "    󰄛  CatNVIM  󰄛",
-        "By Laura Morales Román",
+        '',
+        "     󰄛  CatNVIM  󰄛",
+        " By Laura Morales Román ",
+        '',
     }
 
     -- 2. Calculate width & height
@@ -37,17 +46,17 @@ local function show_centered_intro()
 
     -- 7. Open the floating window (focus remains in main window)
     float_win = vim.api.nvim_open_win(float_buf, false, {
-        relative = "editor",
-        width    = width,
-        height   = height,
-        row      = row,
-        col      = col,
-        style    = "minimal",
-        border   = "none",
+        relative  = "editor",
+        width     = width,
+        height    = height,
+        row       = row,
+        col       = col,
+        style     = "minimal",
+        border    = "rounded",
+        focusable = false
     }) -- leave enter/focus defaults :contentReference[oaicite:7]{index=7}
 
     -- 8. Apply per-window transparency & highlight
-    vim.api.nvim_win_set_option(float_win, "winblend", 100) -- full-window transparency :contentReference[oaicite:8]{index=8}
     vim.api.nvim_win_set_option(
         float_win,
         "winhighlight",
@@ -64,6 +73,7 @@ local function show_centered_intro()
             vim.api.nvim_win_close(float_win, true)
             float_win, float_buf = nil, nil
             vim.on_key(nil, on_key_ns) -- use ns_id here, not a table
+            shown = false
         end
     end, nil, { expr = false })
 end
@@ -88,6 +98,25 @@ vim.api.nvim_create_autocmd("BufReadPost", {
         end
     end,
 })
+
+-- Timer that resets on each user input
+local idle_timer = vim.loop.new_timer()
+local IDLE_TIME = 10000 -- milliseconds
+
+-- Restarts the timer to fire after 5s of inactivity
+local function reset_idle_timer()
+    idle_timer:stop()
+    idle_timer:start(IDLE_TIME, 0, vim.schedule_wrap(show_centered_intro))
+end
+
+-- Autocmds that reset the timer on user activity
+vim.api.nvim_create_autocmd(
+    { "CursorMoved", "CursorMovedI", "InsertEnter", "InsertLeave", "TextChanged", "TextChangedI" }, {
+        callback = reset_idle_timer,
+    })
+
+-- Start timer initially
+reset_idle_timer()
 
 -- Don’t show the intro message on startup
 vim.opt.shortmess:append("I")
