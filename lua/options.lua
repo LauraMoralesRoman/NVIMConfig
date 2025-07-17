@@ -1,4 +1,3 @@
-print 'options'
 -- Leader key
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '

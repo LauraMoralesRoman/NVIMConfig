@@ -9,7 +9,6 @@ local shown = false
 -- Function to show the intro
 local function show_centered_intro()
     if shown then
-        print('Already shown')
         return
     end
 
