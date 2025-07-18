@@ -54,3 +54,15 @@ vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+
+local function open_in_tab_with_w3m()
+    local url = vim.fn.expand('<cfile>') -- get URL/text under cursor
+    vim.cmd(string.format('tabnew | terminal w3m %s', url))
+end
+
+vim.keymap.set(
+    'n',  -- mode: normal
+    'gx', -- key sequence
+    open_in_tab_with_w3m,
+    { noremap = true, silent = true }
+)
