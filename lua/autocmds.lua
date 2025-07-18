@@ -39,18 +39,18 @@ vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
     end,
 })
 
--- Create (or clear) an augroup for our helptag regeneration
 local doc_helptags = vim.api.nvim_create_augroup('DocHelptags', { clear = true })
 
--- Define an autocmd that fires after writing any *.txt under a doc/ directory
 vim.api.nvim_create_autocmd('BufWritePost', {
-    group = doc_helptags,
-    pattern = '**/doc/*.txt',
+    group    = doc_helptags,
+    pattern  = '**/doc/**/*.txt',
     callback = function(ctx)
-        -- ctx.file is the full path of the file just written
-        local doc_dir = vim.fn.fnamemodify(ctx.file, ':p:h')
-        -- silently regenerate helptags for that directory
-        vim.cmd('silent! helptags ' .. vim.fn.fnameescape(doc_dir))
+        -- 1️⃣ Find the top-level 'doc' directory for this file:
+        local doc_root = vim.fn.finddir('doc', vim.fn.fnamemodify(ctx.file, ':p:h') .. ';')
+        if doc_root == '' then return end
+
+        -- 2️⃣ Generate tags there so :help can see them
+        vim.cmd('silent! helptags ' .. vim.fn.fnameescape(doc_root))
     end,
 })
 
