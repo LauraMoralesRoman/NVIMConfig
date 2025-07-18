@@ -1,24 +1,5 @@
 return {
     {
-        "rachartier/tiny-glimmer.nvim",
-        event = "VeryLazy",
-        priority = 10, -- Needs to be a really low priority, to catch others plugins keybindings.
-        opts = {
-            enabled = true,
-            overwrite = {
-                search = {
-                    enabled = true
-                },
-                undo = {
-                    enabled = true
-                },
-                redo = {
-                    enabled = true
-                }
-            }
-        },
-    },
-    {
         'b0o/incline.nvim',
         config = function()
             require('incline').setup {
