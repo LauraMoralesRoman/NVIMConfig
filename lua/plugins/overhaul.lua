@@ -30,7 +30,8 @@ return {
         -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
         lazy = false,
         keys = {
-            { '-', '<cmd>Oil --float<cr>', desc = 'Shows file explorer' }
+            { '-',         '<cmd>Oil --float<cr>',   desc = 'Shows file explorer' },
+            { '<Leader>-', '<cmd>Oil --float .<cr>', desc = 'Shows file explorer at the root directory' }
         }
     }
 }
