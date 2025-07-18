@@ -1,11 +1,11 @@
 -- Make it so when you yank text a temporary highlight appears
-vim.api.nvim_create_autocmd('TextYankPost', {
-    desc = 'Highlight when yanking (copying) text',
-    group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
-    callback = function()
-        vim.highlight.on_yank()
-    end,
-})
+-- vim.api.nvim_create_autocmd('TextYankPost', {
+--     desc = 'Highlight when yanking (copying) text',
+--     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+--     callback = function()
+--         vim.highlight.on_yank()
+--     end,
+-- })
 
 -- Helptags
 -- 1. Capture the “default” runtimepath (as a list of paths)

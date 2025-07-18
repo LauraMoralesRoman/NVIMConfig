@@ -51,3 +51,43 @@ vim.api.nvim_create_user_command('ApplyAuraHighlightChanges', function()
 end, {
     desc = 'Apply the custom highlightings to fix the aura-theme'
 })
+
+
+-- returns Git repo root or fallback to current working directory
+local function project_root()
+    local git_root = vim.fn.systemlist("git rev-parse --show-toplevel")[1]
+    if vim.v.shell_error == 0 and git_root ~= "" then
+        return git_root
+    end
+    return vim.loop.cwd()
+end
+
+vim.api.nvim_create_user_command('AstGrep', function()
+    local root = project_root()
+
+    local opts = {
+        preview = string.format('bat --style=numbers --color=always --highlight-line {2} {1}'),
+        fzf_opts = {
+            ['--preview-window'] = 'right:60%',
+            ['--delimeter'] = ':'
+        },
+        actions = {
+            ['default'] = function(selected)
+                -- selected[1] ~= "path/to/file:123:45: …"
+                local path, line = selected[1]:match('([^:]+):(%d+):')
+                if path and line then
+                    vim.cmd(string.format('%s +%s', path, line))
+                end
+            end,
+        },
+        prompt = 'ast>',
+        exec_empty_query = true,
+        cwd = root
+    }
+
+    require 'fzf-lua'.fzf_live('ast-grep run --pattern <pattern> .', {
+    }, opts)
+end, {
+    nargs = 0,
+    desc  = "Live AST‑grep with proper CLI flags"
+})

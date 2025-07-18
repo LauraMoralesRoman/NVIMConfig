@@ -20,7 +20,10 @@ return {
                     },
                 },
             }
-        end
+        end,
+        formatters_by_ft = {
+            lua = { 'stylua' },
+        },
     },
     {
         'NeogitOrg/neogit',

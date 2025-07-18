@@ -17,6 +17,7 @@ require('lazy').setup {
     require 'plugins.code',
     require 'plugins.custom',
     require 'plugins.overhaul',
+    require 'plugins.visual'
 }
 
 require 'autocmds'

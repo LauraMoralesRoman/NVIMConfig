@@ -16,8 +16,8 @@ local function show_centered_intro()
     -- 1. Your intro text
     local lines  = {
         '',
-        "     󰄛  CatNVIM  󰄛",
-        " By Laura Morales Román ",
+        "      󰄛  CatNVIM  󰄛",
+        "  By Laura Morales Román ",
         '',
     }
 
@@ -100,7 +100,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 
 -- Timer that resets on each user input
 local idle_timer = vim.loop.new_timer()
-local IDLE_TIME = 10000 -- milliseconds
+local IDLE_TIME = 30000 -- milliseconds
 
 -- Restarts the timer to fire after 5s of inactivity
 local function reset_idle_timer()
@@ -113,6 +113,8 @@ vim.api.nvim_create_autocmd(
     { "CursorMoved", "CursorMovedI", "InsertEnter", "InsertLeave", "TextChanged", "TextChangedI" }, {
         callback = reset_idle_timer,
     })
+
+vim.api.nvim_create_user_command('Intro', show_centered_intro, { desc = 'Shows intro' })
 
 -- Start timer initially
 reset_idle_timer()

@@ -6,7 +6,7 @@ vim.g.maplocalleader = ' '
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = ''
-vim.opt.cmdheight = 0
+vim.opt.cmdheight = 1
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
@@ -37,6 +37,7 @@ vim.opt.listchars = {
 vim.opt.inccommand = 'split'
 vim.opt.cursorline = false
 vim.opt.hlsearch = true
+vim.opt.laststatus = 3
 
 -- GUI options
 
