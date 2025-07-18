@@ -91,3 +91,15 @@ end, {
     nargs = 0,
     desc  = "Live AST‑grep with proper CLI flags"
 })
+
+-- 3️⃣ Create a command to rename the current tab
+vim.api.nvim_create_user_command('TabRename', function(opts)
+    local new_name = opts.args
+    -- Set tab-local variable 'TabName' on the **current** tab (0)
+    vim.api.nvim_tabpage_set_var(0, 'TabName', new_name)
+    -- Redraw the tabline so the change appears immediately
+    vim.o.tabline = vim.o.tabline
+end, {
+    nargs = 1,
+    desc = 'Rename the current tab'
+})

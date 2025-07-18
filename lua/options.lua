@@ -91,3 +91,35 @@ vim.diagnostic.config({
         end,
     }
 })
+
+function TabLine()
+    local s     = ""
+    local cur   = vim.fn.tabpagenr()    -- current tab index :contentReference[oaicite:4]{index=4}
+    local total = vim.fn.tabpagenr('$') -- total number of tabs :contentReference[oaicite:5]{index=5}
+    for i = 1, total do
+        -- highlight selected vs inactive
+        s = s .. (i == cur and '%#TabLineSel#' or '%#TabLine#')
+        -- make tabs clickable: %iT jumps to tab i
+        s = s .. '%' .. i .. 'T '
+
+        -- try to get a custom name
+        local ok, name = pcall(vim.api.nvim_tabpage_get_var, i, 'TabName')
+        if not ok or name == '' then
+            -- fallback: use buffer filename tail
+            local buflist = vim.fn.tabpagebuflist(i)
+            local winnr   = vim.fn.tabpagewinnr(i)
+            local buf     = buflist[winnr]
+            -- vim.api.nvim_buf_get_name always expects a valid buffer handle
+            local full    = vim.api.nvim_buf_get_name(buf)
+            name          = vim.fn.fnamemodify(full, ':t') -- tail of path :contentReference[oaicite:7]{index=7}
+            if name == '' then name = '[No Name]' end
+        end
+
+        s = s .. ' ' .. name .. ' '
+    end
+    -- fill remainder of line
+    return s .. '%#TabLineFill#%T'
+end
+
+-- 2️⃣ Tell Neovim to use it
+vim.o.tabline = '%!v:lua.TabLine()'
