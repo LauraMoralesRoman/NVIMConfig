@@ -103,3 +103,137 @@ end, {
     nargs = 1,
     desc = 'Rename the current tab'
 })
+
+-- Models I've tested:
+-- llama3.1 for messages
+-- nomic-embed-text:latest
+
+local function run_job_quickfix(cmd, input, on_success)
+    local stderr_buf = {}
+    local stdout_buf = {}
+
+    local job_id = vim.fn.jobstart(cmd, {
+        stdin           = "pipe",
+        stdout_buffered = true,
+        stderr_buffered = true,
+        on_stdout       = function(_, data)
+            if data then
+                for _, line in ipairs(data) do
+                    if line ~= "" then table.insert(stdout_buf, line) end
+                end
+            end
+        end,
+        on_stderr       = function(_, data)
+            if data then
+                for _, line in ipairs(data) do
+                    if line ~= "" then
+                        table.insert(stderr_buf, line)
+                    end
+                end
+            end
+        end,
+        on_exit         = vim.schedule_wrap(function(_, exit_code)
+            if exit_code ~= 0 and #stderr_buf > 0 then
+                -- build quickfix items
+                local items = {}
+                for _, line in ipairs(stderr_buf) do
+                    table.insert(items, { text = line })
+                end
+                -- replace quickfix list and open it
+                vim.fn.setqflist({}, "r", {
+                    title = "Job Errors: " .. cmd[1],
+                    items = items,
+                })
+                vim.cmd("copen")
+            elseif exit_code == 0 and on_success then
+                local out = table.concat(stdout_buf, '\n')
+                on_success(out)
+            end
+        end),
+    })
+
+    vim.fn.chansend(job_id, input)
+    vim.fn.chanclose(job_id, "stdin")
+end
+
+
+local function embed_selection(opts, generate_description)
+    local bufnr                = vim.api.nvim_get_current_buf()
+    local fullpath             = vim.api.nvim_buf_get_name(bufnr)
+    local filename             = vim.fn.fnamemodify(fullpath, ":t")
+
+    -- Determine visual or explicit range
+    local start_line, end_line = nil, nil
+    if opts.range then
+        start_line, end_line = opts.line1, opts.line2
+    else
+        start_line = vim.fn.getpos("'<")[2]
+        end_line   = vim.fn.getpos("'>")[2]
+    end
+    local range_str  = string.format("%d-%d", start_line, end_line)
+
+    -- Generate UUID (requires uuidgen in PATH)
+    local uuid       = vim.fn.system("uuidgen"):gsub("%s+", "")
+
+    local key        = table.concat({ filename, range_str, uuid }, "_")
+    local lines      = vim.api.nvim_buf_get_lines(bufnr, start_line - 1, end_line, false)
+    local text       = table.concat(lines, "\n")
+    local table_name = opts.args
+    local filename   = vim.fn.expand('%:p')
+
+
+    if generate_description then
+        vim.notify("Generating metadata for " .. key, vim.log.levels.INFO)
+        run_job_quickfix(
+            { "llm", "-s", string.format('Generate a short description. For the file %s at the line range %d:%d',
+                filename, start_line, end_line),
+                "--schema",
+                '{ "type": "object", "properties": { "description": { "type": "string" }, "filename": { "type": "string" }, "lines": { "type": "string" } }, "required": ["description", "filename", "lines"], "additionalProperties": false }' },
+            text,
+            function(metadata)
+                -- on metadata success, launch embedding job likewise
+                print(metadata)
+                run_job_quickfix(
+                    { "llm", "embed", "--metadata", metadata, "--store", table_name, key },
+                    text,
+                    function(_)
+                        vim.notify("Embedding saved: " .. key, vim.log.levels.INFO)
+                    end
+                )
+            end
+        )
+    else
+        local metadata = string.format('{"filename": "%s", "lines": "%d:%d"}', filename, start_line, end_line)
+        run_job_quickfix(
+            { "llm", "embed", '--metadata', metadata, "--store", table_name, key },
+            text,
+            function()
+                vim.notify("Embedding saved: " .. key, vim.log.levels.INFO)
+            end
+        )
+    end
+end
+
+vim.api.nvim_create_user_command(
+    "Embed",
+    function(opts)
+        embed_selection(opts, false)
+    end,
+    {
+        range = true, -- allow :<start>,<end>Embed
+        nargs = 1,    -- require exactly one argument
+        desc  = "Embed the given lines: llm embed --save <table> <key>",
+    }
+)
+
+vim.api.nvim_create_user_command(
+    "EmbedDescription",
+    function(opts)
+        embed_selection(opts, true)
+    end,
+    {
+        range = true, -- allow :<start>,<end>Embed
+        nargs = 1,    -- require exactly one argument
+        desc  = "Embed the given lines: llm embed --save <table> <key>",
+    }
+)

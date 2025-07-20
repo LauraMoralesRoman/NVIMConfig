@@ -46,6 +46,7 @@ if vim.g.neovide then
     vim.g.neovide_scale_factor = 1.0
     vim.g.neovide_text_gamma = 0.9
     vim.g.neovide_text_contrast = 0.1
+    vim.g.neovide_fullscreen = true
 end
 
 vim.env.FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow'
