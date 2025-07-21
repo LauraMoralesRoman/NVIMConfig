@@ -32,6 +32,9 @@ vim.api.nvim_create_user_command('ToggleInlayHints', function()
     vim.lsp.inlay_hint.enable(inlay_hints_enabled)
 end, { nargs = 0 })
 
+vim.api.nvim_create_user_command('Title', 'norm i=<Esc>vy77p', { nargs = 0 })
+vim.api.nvim_create_user_command('Subtitle', 'norm i-<Esc>vy77p', { nargs = 0 })
+
 -- in your init.lua:
 vim.api.nvim_create_user_command('ToggleEditorGuides', function()
     local enabled = vim.wo.colorcolumn ~= '80'
