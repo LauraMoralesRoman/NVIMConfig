@@ -238,37 +238,89 @@ vim.api.nvim_create_user_command(
     }
 )
 
-local function llm_similar_to_qf(collection, query)
-    -- 1. Run the external command, get each JSON line as a table entry
-    local cmd = { "llm", "similar", collection, '-c', query }
-    local lines = vim.fn.systemlist(cmd) -- :contentReference[oaicite:0]{index=0}
+local function llm_similar_to_qf(collection)
+  local data = {}  -- will hold id → parsed object
 
-    -- 2. Handle errors
-    if vim.v.shell_error ~= 0 then
-        vim.api.nvim_err_writeln("LLM similar failed:\n" .. table.concat(lines, "\n"))
-        return
-    end
+  require("fzf-lua").fzf_live(
+    -- fn(query) : called on every keystroke (subject to debounce)
+    function(query)
+      -- 1. run your external LLM command
+      local cmd   = { "llm", "similar", collection, "-c", query }
+      local lines = vim.fn.systemlist(cmd)
 
-    -- 3. Decode JSON lines into quickfix items
-    local items = {}
-    for _, line in ipairs(lines) do
+      if vim.v.shell_error ~= 0 then
+        -- return a single-item list with the error
+        return { "⚠ LLM similar failed:\n" .. table.concat(lines, "\n") }
+      end
+
+      -- 2. parse JSON lines and collect IDs
+      data = {}
+      local ids = {}
+      for _, line in ipairs(lines) do
         local ok, obj = pcall(vim.fn.json_decode, line)
-        if ok and type(obj) == "table" then
-            local file = (obj.metadata and obj.metadata.filename) or ""
-            local lnum = (obj.metadata and obj.metadata.line) or 1
-            local text = obj.content or ""
-            local score = obj.score or 0
-            local display = string.format('[%.5f] %s', score, text)
-            table.insert(items, { filename = file, lnum = lnum, text = display })
+        if ok and type(obj) == "table" and obj.id then
+          data[obj.id] = obj
+          table.insert(ids, obj.id)
         end
-    end
+      end
 
-    print(items)
+      vim.print(ids)
 
-    -- 4. Populate and open quickfix list
-    vim.fn.setqflist({}, 'r', { title = ("Similar ‹%s›"):format(query), items = items })
-    vim.cmd("copen")
+      return ids
+    end,
+    {
+      prompt           = string.format("Similar (%s)> ", collection),
+      exec_empty_query = false,      -- run even when query is empty
+      debounce_delay   = 1000,       -- wait 200 ms after last keypress
+
+      -- Preview the selected ID by pulling from `data`
+      preview = function(entry)
+        local obj = data[entry[1]]
+        if not obj then
+          return "No preview available"
+        end
+        local md   = obj.metadata or {}
+        local file = md.filename or "[no file]"
+        local ln   = md.line     or 1
+        local score= obj.score   or 0
+        local txt  = obj.content or ""
+        return string.format(
+          "[%s:%d]\n SCORE: %.5f\n\n%s",
+          file, ln, score, txt
+        )
+      end,
+
+      -- Layout and sizing
+      winopts = {
+        height = 0.7,
+        width  = 0.6,
+        row    = 0.3,
+        col    = 0.5,
+      },
+
+      fzf_opts = {
+        ["--layout"] = "reverse-list",
+        -- optionally bind <C-p> to toggle preview:
+        ["--preview-window"] = "right:60%",
+      },
+
+      -- On <Enter>, open the file at the specified line
+      actions = {
+        default = function(selected)
+          local obj = data[selected[1]]
+          if obj and obj.metadata and obj.metadata.filename then
+            local f = obj.metadata.filename
+            local l = obj.metadata.line or 1
+            vim.cmd(string.format("edit +%d %s", l, f))
+          end
+        end,
+      },
+    }
+  )
 end
+
+-- Usage:
+-- :lua llm_similar_to_qf("my-collection")
 
 function get_embed_projects()
     local out = vim.fn.system({ 'llm', 'collections', 'list', '--json' })
@@ -291,33 +343,78 @@ end
 vim.api.nvim_create_user_command("FindEmbed", function(opts)
     -- Use opts.fargs to safely handle arguments
     local fargs = opts.fargs
-    if #fargs < 2 then
-        vim.api.nvim_err_writeln("Usage: FindEmbed <collection> <query>")
-        return
-    end
     local collection = fargs[1]
     -- Concatenate remaining args as query
-    local query = table.concat({ unpack(fargs, 2) }, " ")
-    llm_similar_to_qf(collection, query)
+    llm_similar_to_qf(collection)
 end, {
-    nargs = "+",
+    nargs = 1,
     complete = function(arg_lead)
         return get_embed_projects()
     end,
 })
 
 vim.api.nvim_create_user_command('ListEmbeds', function()
-    print('items')
     for _, item in ipairs(get_embed_projects()) do
         print(item)
     end
-    -- run_job_quickfix({})
 end, {
     nargs = 0
 })
 
 vim.api.nvim_create_user_command('DeleteEmbeds', function(opts)
     run_job_quickfix({ 'llm', 'collections', 'delete', opts.fargs[1] }, nil, function(_) end)
+end, {
+    nargs = 1,
+    complete = function(arg_lead)
+        return get_embed_projects()
+    end
+})
+
+vim.api.nvim_create_user_command('DeleteEmbeddingEntry', function(opts)
+    local db = vim.fn.systemlist({ 'llm', 'collections', 'path' })[1] -- Fucking newline
+    print('Removing from ' .. db)
+
+    local collection = opts.fargs[1]
+    local query =
+        string.format(
+            'SELECT embeddings.id, content FROM embeddings JOIN collections ON collection_id = collections.id WHERE collections.name = \'%s\'',
+            collection)
+    local out = vim.fn.system({ 'sqlite3', db, '.mode json', query })
+    local ok, obj = pcall(vim.fn.json_decode, out)
+
+    if not ok then
+        print('Failed to get information: ', out)
+    end
+
+    local items = {}
+
+    for _, item in ipairs(obj) do
+        table.insert(items, item.id)
+    end
+
+    local previews = {}
+
+    for _, item in ipairs(obj) do
+        previews[item.id] = item.content
+    end
+
+    require("fzf-lua").fzf_exec(items, {
+        preview  = function(entry, line_nr, _fzf_opts)
+            return previews[entry[1]] or 'not found'
+        end,
+        prompt   = 'Select id to delete',
+        winopts  = { height = 0.7, width = 0.6, row = 0.3, col = 0.5 },
+        fzf_opts = {
+            ["--layout"] = "reverse-list",
+        },
+        actions  = {
+            ["default"] = function(selected)
+                local query = string.format('DELETE FROM embeddings WHERE id = \'%s\'', selected[1])
+                local out = vim.fn.system({ 'sqlite3', db, query })
+                print(out)
+            end,
+        },
+    })
 end, {
     nargs = 1,
     complete = function(arg_lead)
