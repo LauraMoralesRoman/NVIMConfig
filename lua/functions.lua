@@ -192,7 +192,6 @@ local function embed_selection(opts, generate_description)
             text,
             function(metadata)
                 -- on metadata success, launch embedding job likewise
-                print(metadata)
                 run_job_quickfix(
                     { "llm", "embed", "--metadata", metadata, "--store", table_name, key },
                     text,
@@ -263,8 +262,6 @@ local function llm_similar_to_qf(collection)
           table.insert(ids, obj.id)
         end
       end
-
-      vim.print(ids)
 
       return ids
     end,
