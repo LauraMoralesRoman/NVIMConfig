@@ -26,6 +26,12 @@ end, {
     desc = 'Toggle highlight on the current window',
 })
 
+local inlay_hints_enabled = false
+vim.api.nvim_create_user_command('ToggleInlayHints', function()
+    inlay_hints_enabled = not inlay_hints_enabled
+    vim.lsp.inlay_hint.enable(inlay_hints_enabled)
+end, { nargs = 0 })
+
 -- in your init.lua:
 vim.api.nvim_create_user_command('ToggleEditorGuides', function()
     local enabled = vim.wo.colorcolumn ~= '80'
@@ -238,82 +244,82 @@ vim.api.nvim_create_user_command(
 )
 
 local function llm_similar_to_qf(collection)
-  local data = {}  -- will hold id → parsed object
+    local data = {} -- will hold id → parsed object
 
-  require("fzf-lua").fzf_live(
+    require("fzf-lua").fzf_live(
     -- fn(query) : called on every keystroke (subject to debounce)
-    function(query)
-      -- 1. run your external LLM command
-      local cmd   = { "llm", "similar", collection, "-c", query }
-      local lines = vim.fn.systemlist(cmd)
+        function(query)
+            -- 1. run your external LLM command
+            local cmd   = { "llm", "similar", collection, "-c", query }
+            local lines = vim.fn.systemlist(cmd)
 
-      if vim.v.shell_error ~= 0 then
-        -- return a single-item list with the error
-        return { "⚠ LLM similar failed:\n" .. table.concat(lines, "\n") }
-      end
+            if vim.v.shell_error ~= 0 then
+                -- return a single-item list with the error
+                return { "⚠ LLM similar failed:\n" .. table.concat(lines, "\n") }
+            end
 
-      -- 2. parse JSON lines and collect IDs
-      data = {}
-      local ids = {}
-      for _, line in ipairs(lines) do
-        local ok, obj = pcall(vim.fn.json_decode, line)
-        if ok and type(obj) == "table" and obj.id then
-          data[obj.id] = obj
-          table.insert(ids, obj.id)
-        end
-      end
+            -- 2. parse JSON lines and collect IDs
+            data = {}
+            local ids = {}
+            for _, line in ipairs(lines) do
+                local ok, obj = pcall(vim.fn.json_decode, line)
+                if ok and type(obj) == "table" and obj.id then
+                    data[obj.id] = obj
+                    table.insert(ids, obj.id)
+                end
+            end
 
-      return ids
-    end,
-    {
-      prompt           = string.format("Similar (%s)> ", collection),
-      exec_empty_query = false,      -- run even when query is empty
-      debounce_delay   = 1000,       -- wait 200 ms after last keypress
-
-      -- Preview the selected ID by pulling from `data`
-      preview = function(entry)
-        local obj = data[entry[1]]
-        if not obj then
-          return "No preview available"
-        end
-        local md   = obj.metadata or {}
-        local file = md.filename or "[no file]"
-        local ln   = md.line     or 1
-        local score= obj.score   or 0
-        local txt  = obj.content or ""
-        return string.format(
-          "[%s:%d]\n SCORE: %.5f\n\n%s",
-          file, ln, score, txt
-        )
-      end,
-
-      -- Layout and sizing
-      winopts = {
-        height = 0.7,
-        width  = 0.6,
-        row    = 0.3,
-        col    = 0.5,
-      },
-
-      fzf_opts = {
-        ["--layout"] = "reverse-list",
-        -- optionally bind <C-p> to toggle preview:
-        ["--preview-window"] = "right:60%",
-      },
-
-      -- On <Enter>, open the file at the specified line
-      actions = {
-        default = function(selected)
-          local obj = data[selected[1]]
-          if obj and obj.metadata and obj.metadata.filename then
-            local f = obj.metadata.filename
-            local l = obj.metadata.line or 1
-            vim.cmd(string.format("edit +%d %s", l, f))
-          end
+            return ids
         end,
-      },
-    }
-  )
+        {
+            prompt           = string.format("Similar (%s)> ", collection),
+            exec_empty_query = false, -- run even when query is empty
+            debounce_delay   = 1000,  -- wait 200 ms after last keypress
+
+            -- Preview the selected ID by pulling from `data`
+            preview          = function(entry)
+                local obj = data[entry[1]]
+                if not obj then
+                    return "No preview available"
+                end
+                local md    = obj.metadata or {}
+                local file  = md.filename or "[no file]"
+                local ln    = md.line or 1
+                local score = obj.score or 0
+                local txt   = obj.content or ""
+                return string.format(
+                    "[%s:%d]\n SCORE: %.5f\n\n%s",
+                    file, ln, score, txt
+                )
+            end,
+
+            -- Layout and sizing
+            winopts          = {
+                height = 0.7,
+                width  = 0.6,
+                row    = 0.3,
+                col    = 0.5,
+            },
+
+            fzf_opts         = {
+                ["--layout"] = "reverse-list",
+                -- optionally bind <C-p> to toggle preview:
+                ["--preview-window"] = "right:60%",
+            },
+
+            -- On <Enter>, open the file at the specified line
+            actions          = {
+                default = function(selected)
+                    local obj = data[selected[1]]
+                    if obj and obj.metadata and obj.metadata.filename then
+                        local f = obj.metadata.filename
+                        local l = obj.metadata.line or 1
+                        vim.cmd(string.format("edit +%d %s", l, f))
+                    end
+                end,
+            },
+        }
+    )
 end
 
 -- Usage:

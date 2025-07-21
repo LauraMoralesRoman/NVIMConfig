@@ -39,6 +39,9 @@ vim.opt.cursorline = false
 vim.opt.hlsearch = true
 vim.opt.laststatus = 3
 
+-- LSP
+vim.lsp.inlay_hint.enable(true)
+
 -- GUI options
 
 if vim.g.neovide then
