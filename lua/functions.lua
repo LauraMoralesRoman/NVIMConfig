@@ -257,7 +257,9 @@ local function llm_similar_to_qf(collection, query)
             local file = (obj.metadata and obj.metadata.filename) or ""
             local lnum = (obj.metadata and obj.metadata.line) or 1
             local text = obj.content or ""
-            table.insert(items, { filename = file, lnum = lnum, text = text })
+            local score = obj.score or 0
+            local display = string.format('[%.5f] %s', score, text)
+            table.insert(items, { filename = file, lnum = lnum, text = display })
         end
     end
 
@@ -266,6 +268,23 @@ local function llm_similar_to_qf(collection, query)
     -- 4. Populate and open quickfix list
     vim.fn.setqflist({}, 'r', { title = ("Similar ‹%s›"):format(query), items = items })
     vim.cmd("copen")
+end
+
+function get_embed_projects()
+    local out = vim.fn.system({ 'llm', 'collections', 'list', '--json' })
+
+    local ok, obj = pcall(vim.fn.json_decode, out)
+
+    local names = {}
+
+    if ok then
+        for _, item in ipairs(obj) do
+            table.insert(names, item.name)
+        end
+        return names
+    end
+
+    return {}
 end
 
 -- Create a user command: :LLMSimilarQF <collection> <query...>
@@ -283,6 +302,25 @@ vim.api.nvim_create_user_command("FindEmbed", function(opts)
 end, {
     nargs = "+",
     complete = function(arg_lead)
-        return {}
+        return get_embed_projects()
     end,
+})
+
+vim.api.nvim_create_user_command('ListEmbeds', function()
+    print('items')
+    for _, item in ipairs(get_embed_projects()) do
+        print(item)
+    end
+    -- run_job_quickfix({})
+end, {
+    nargs = 0
+})
+
+vim.api.nvim_create_user_command('DeleteEmbeds', function(opts)
+    run_job_quickfix({ 'llm', 'collections', 'delete', opts.fargs[1] }, nil, function(_) end)
+end, {
+    nargs = 1,
+    complete = function(arg_lead)
+        return get_embed_projects()
+    end
 })
