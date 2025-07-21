@@ -185,10 +185,10 @@ local function embed_selection(opts, generate_description)
     if generate_description then
         vim.notify("Generating metadata for " .. key, vim.log.levels.INFO)
         run_job_quickfix(
-            { "llm", "-s", string.format('Generate a short description. For the file %s at the line range %d:%d',
-                filename, start_line, end_line),
+            { "llm", "-s", string.format('Generate a short description. For the file %s at the line %d',
+                filename, start_line),
                 "--schema",
-                '{ "type": "object", "properties": { "description": { "type": "string" }, "filename": { "type": "string" }, "lines": { "type": "string" } }, "required": ["description", "filename", "lines"], "additionalProperties": false }' },
+                '{ "type": "object", "properties": { "description": { "type": "string" }, "filename": { "type": "string" }, "line": { "type": "number" } }, "required": ["description", "filename", "lines"], "additionalProperties": false }' },
             text,
             function(metadata)
                 -- on metadata success, launch embedding job likewise
@@ -203,7 +203,7 @@ local function embed_selection(opts, generate_description)
             end
         )
     else
-        local metadata = string.format('{"filename": "%s", "lines": "%d:%d"}', filename, start_line, end_line)
+        local metadata = string.format('{"filename": "%s", "line": "%d"}', filename, start_line)
         run_job_quickfix(
             { "llm", "embed", '--metadata', metadata, "--store", table_name, key },
             text,
@@ -237,3 +237,52 @@ vim.api.nvim_create_user_command(
         desc  = "Embed the given lines: llm embed --save <table> <key>",
     }
 )
+
+local function llm_similar_to_qf(collection, query)
+    -- 1. Run the external command, get each JSON line as a table entry
+    local cmd = { "llm", "similar", collection, '-c', query }
+    local lines = vim.fn.systemlist(cmd) -- :contentReference[oaicite:0]{index=0}
+
+    -- 2. Handle errors
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_err_writeln("LLM similar failed:\n" .. table.concat(lines, "\n"))
+        return
+    end
+
+    -- 3. Decode JSON lines into quickfix items
+    local items = {}
+    for _, line in ipairs(lines) do
+        local ok, obj = pcall(vim.fn.json_decode, line)
+        if ok and type(obj) == "table" then
+            local file = (obj.metadata and obj.metadata.filename) or ""
+            local lnum = (obj.metadata and obj.metadata.line) or 1
+            local text = obj.content or ""
+            table.insert(items, { filename = file, lnum = lnum, text = text })
+        end
+    end
+
+    print(items)
+
+    -- 4. Populate and open quickfix list
+    vim.fn.setqflist({}, 'r', { title = ("Similar ‹%s›"):format(query), items = items })
+    vim.cmd("copen")
+end
+
+-- Create a user command: :LLMSimilarQF <collection> <query...>
+vim.api.nvim_create_user_command("FindEmbed", function(opts)
+    -- Use opts.fargs to safely handle arguments
+    local fargs = opts.fargs
+    if #fargs < 2 then
+        vim.api.nvim_err_writeln("Usage: FindEmbed <collection> <query>")
+        return
+    end
+    local collection = fargs[1]
+    -- Concatenate remaining args as query
+    local query = table.concat({ unpack(fargs, 2) }, " ")
+    llm_similar_to_qf(collection, query)
+end, {
+    nargs = "+",
+    complete = function(arg_lead)
+        return {}
+    end,
+})
