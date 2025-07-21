@@ -435,3 +435,65 @@ end, {
         return get_embed_projects()
     end
 })
+
+function center_block()
+    -- grab buffer and visual range (convert to 0‑based)
+    local bufnr      = vim.api.nvim_get_current_buf()
+    local line_start = vim.fn.line("'<") - 1
+    local line_end   = vim.fn.line("'>") - 1
+
+    -- get textwidth
+    local tw         = vim.api.nvim_buf_get_option(bufnr, "textwidth")
+    if tw == 0 then
+        vim.notify("Cannot center: textwidth is 0", vim.log.levels.WARN)
+        return
+    end
+
+    -- fetch lines in the selection
+    local lines = vim.api.nvim_buf_get_lines(bufnr, line_start, line_end + 1, false)
+
+    -- 1) compute the minimal leading‑space width across all non‑blank lines
+    local min_indent
+    for _, line in ipairs(lines) do
+        if line:find("%S") then
+            local lead = line:match("^%s*")
+            local w = vim.fn.strdisplaywidth(lead)
+            min_indent = min_indent and math.min(min_indent, w) or w
+        end
+    end
+    min_indent = min_indent or 0
+
+    -- 2) strip that common indent, measure each stripped line, find the block’s max width
+    local stripped = {}
+    local max_w = 0
+    for i, line in ipairs(lines) do
+        local content = line
+        if min_indent > 0 then
+            -- remove exactly min_indent columns of whitespace
+            -- (assumes those were spaces; tabs will count as wider)
+            content = content:sub(min_indent + 1)
+        end
+        stripped[i] = content
+        max_w = math.max(max_w, vim.fn.strdisplaywidth(content))
+    end
+
+    -- 3) compute left padding to center the block
+    local pad = math.floor((tw - max_w) / 2)
+    if pad < 0 then pad = 0 end
+
+    -- 4) re‑build each line: pad + stripped content
+    local new_lines = {}
+    for i, content in ipairs(stripped) do
+        new_lines[i] = string.rep(" ", pad) .. content
+    end
+
+    -- 5) replace the buffer region
+    vim.api.nvim_buf_set_lines(bufnr, line_start, line_end + 1, false, new_lines)
+end
+
+vim.api.nvim_create_user_command("Center", function(opts)
+    -- set the '< and '> marks to the given range
+    vim.fn.setpos("'<", { 0, opts.line1, 1, 0 })
+    vim.fn.setpos("'>", { 0, opts.line2, 1, 0 })
+    center_block()
+end, { range = true })
