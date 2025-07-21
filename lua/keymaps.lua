@@ -36,6 +36,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- QOL
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true }) -- Exit terminal mode
+vim.keymap.set('n', '<C-c>', '<Esc>')
 
 -- Tools
 vim.keymap.set('n', '<Leader>t', '<cmd>Lspsaga term_toggle<cr>')
