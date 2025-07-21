@@ -26,7 +26,7 @@ end, {
     desc = 'Toggle highlight on the current window',
 })
 
-local inlay_hints_enabled = false
+local inlay_hints_enabled = true
 vim.api.nvim_create_user_command('ToggleInlayHints', function()
     inlay_hints_enabled = not inlay_hints_enabled
     vim.lsp.inlay_hint.enable(inlay_hints_enabled)
