@@ -1,3 +1,5 @@
+local support = require 'support'
+
 return {
     "nyoom-engineering/oxocarbon.nvim",
     {
@@ -108,5 +110,22 @@ return {
                 end,
             })
         end,
+    },
+    {
+        'jbyuki/venn.nvim',
+        lazy = true,
+        keys = {
+            {
+                '<leader>v',
+                mode = 'n',
+                function()
+                    if support.toggle_venn() then
+                        vim.notify('Activating diagram mode', vim.log.levels.INFO, {})
+                    else
+                        vim.notify('Deactivating diagram mode', vim.log.levels.INFO, {})
+                    end
+                end,
+            },
+        },
     }
 }
