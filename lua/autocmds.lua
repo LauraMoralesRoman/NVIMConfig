@@ -43,7 +43,7 @@ local doc_helptags = vim.api.nvim_create_augroup('DocHelptags', { clear = true }
 
 vim.api.nvim_create_autocmd('BufWritePost', {
     group    = doc_helptags,
-    pattern  = '**/doc/**/*.txt',
+    pattern  = { '**/doc/**/*.txt', '**/doc/*.txt' },
     callback = function(ctx)
         -- 1️⃣ Find the top-level 'doc' directory for this file:
         local doc_root = vim.fn.finddir('doc', vim.fn.fnamemodify(ctx.file, ':p:h') .. ';')
