@@ -34,7 +34,6 @@ vim.opt.listchars = {
     extends = '',
     precedes = '',
 }
-vim.opt.inccommand = 'split'
 vim.opt.cursorline = false
 vim.opt.hlsearch = true
 vim.opt.laststatus = 3

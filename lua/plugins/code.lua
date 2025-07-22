@@ -92,6 +92,15 @@ return {
                     lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
                 }
             end,
+            formatters_by_ft = {
+                lua    = { "stylua" },       -- your existing Lua formatter
+                c      = { "clang-format" }, -- C files
+                cpp    = { "clang-format" }, -- C++ files
+                objc   = { "clang-format" }, -- Objective‑C files
+                objcpp = { "clang-format" }, -- Objective‑C++ files
+                cuda   = { "clang-format" }, -- CUDA source files
+                proto  = { "clang-format" }, -- Protocol Buffers
+            }
         },
     },
     {
