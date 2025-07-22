@@ -32,16 +32,8 @@ vim.api.nvim_create_user_command('ToggleInlayHints', function()
     vim.lsp.inlay_hint.enable(inlay_hints_enabled)
 end, { nargs = 0 })
 
-vim.api.nvim_create_user_command('Title', function()
-    vim.cmd('norm! i=')
-    vim.cmd('norm! vy77po')
-    vim.fn.feedkeys('i', 'n')
-end, { nargs = 0 })
-vim.api.nvim_create_user_command('Subtitle', function()
-    vim.cmd('norm! i-')
-    vim.cmd('norm! vy77po')
-    vim.fn.feedkeys('i', 'n')
-end, { nargs = 0 })
+vim.api.nvim_create_user_command('Title', 'norm i-<Esc>vy77po', { nargs = 0 })
+vim.api.nvim_create_user_command('Subtitle', 'norm i-<Esc>vy77po', { nargs = 0 })
 
 -- in your init.lua:
 vim.api.nvim_create_user_command('ToggleEditorGuides', function()
@@ -192,42 +184,47 @@ local function embed_selection(opts, generate_description)
     -- Generate UUID (requires uuidgen in PATH)
     local uuid       = vim.fn.system("uuidgen"):gsub("%s+", "")
 
-    local key        = table.concat({ filename, range_str, uuid }, "_")
     local lines      = vim.api.nvim_buf_get_lines(bufnr, start_line - 1, end_line, false)
     local text       = table.concat(lines, "\n")
     local table_name = opts.args
     local filename   = vim.fn.expand('%:p')
 
 
-    if generate_description then
-        vim.notify("Generating metadata for " .. key, vim.log.levels.INFO)
-        run_job_quickfix(
-            { "llm", "-s", string.format('Generate a short description. For the file %s at the line %d',
-                filename, start_line),
-                "--schema",
-                '{ "type": "object", "properties": { "description": { "type": "string" }, "filename": { "type": "string" }, "line": { "type": "number" } }, "required": ["description", "filename", "lines"], "additionalProperties": false }' },
-            text,
-            function(metadata)
-                -- on metadata success, launch embedding job likewise
-                run_job_quickfix(
-                    { "llm", "embed", "--metadata", metadata, "--store", table_name, key },
-                    text,
-                    function(_)
-                        vim.notify("Embedding saved: " .. key, vim.log.levels.INFO)
-                    end
-                )
-            end
-        )
-    else
-        local metadata = string.format('{"filename": "%s", "line": "%d"}', filename, start_line)
-        run_job_quickfix(
-            { "llm", "embed", '--metadata', metadata, "--store", table_name, key },
-            text,
-            function()
-                vim.notify("Embedding saved: " .. key, vim.log.levels.INFO)
-            end
-        )
-    end
+    local uuid       = vim.fn.system("uuidgen"):gsub("%s+", "")
+    local key_prompt = string.format('%s\nSummarize this text in 10 words', text)
+    print('Generating key')
+    run_job_quickfix({ 'llm', '-m', 'qwen2.5:0.5b-instruct', '-c', key_prompt }, nil, function(out)
+        local key = string.format('%s [%s]', out, uuid)
+        if generate_description then
+            vim.notify("Generating metadata for " .. key, vim.log.levels.INFO)
+            run_job_quickfix(
+                { "llm", "-s", string.format('Generate a short description. For the file %s at the line %d',
+                    filename, start_line),
+                    "--schema",
+                    '{ "type": "object", "properties": { "description": { "type": "string" }, "filename": { "type": "string" }, "line": { "type": "number" } }, "required": ["description", "filename", "lines"], "additionalProperties": false }' },
+                text,
+                function(metadata)
+                    -- on metadata success, launch embedding job likewise
+                    run_job_quickfix(
+                        { "llm", "embed", "--metadata", metadata, "--store", table_name, key },
+                        text,
+                        function(_)
+                            vim.notify("Embedding saved: " .. key, vim.log.levels.INFO)
+                        end
+                    )
+                end
+            )
+        else
+            local metadata = string.format('{"filename": "%s", "line": "%d"}', filename, start_line)
+            run_job_quickfix(
+                { "llm", "embed", '--metadata', metadata, "--store", table_name, key },
+                text,
+                function()
+                    vim.notify("Embedding saved: " .. key, vim.log.levels.INFO)
+                end
+            )
+        end
+    end)
 end
 
 vim.api.nvim_create_user_command(
