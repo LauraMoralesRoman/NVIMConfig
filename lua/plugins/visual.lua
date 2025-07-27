@@ -37,7 +37,14 @@ return {
   },
   {
     'karb94/neoscroll.nvim',
-    opts = {},
+    config = function()
+      require('neoscroll.config').set_mappings {
+        ['<C-u>'] = { 'scroll', { '-vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page up :contentReference[oaicite:17]{index=17}
+        ['<C-d>'] = { 'scroll', { 'vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page down :contentReference[oaicite:18]{index=18}
+        ['<C-b>'] = { 'scroll', { '-vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page up :contentReference[oaicite:19]{index=19}
+        ['<C-f>'] = { 'scroll', { 'vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page down :contentReference[oaicite:20]{index=20}
+      }
+    end,
   },
   {
     'sphamba/smear-cursor.nvim',
@@ -45,14 +52,26 @@ return {
     opts = {
       smear_between_buffers = not vim.g.neovide,
       smear_between_neighbor_lines = not vim.g.neovide,
-      scroll_buffer_space = not vim.g.neovide,
+      -- scroll_buffer_space = not vim.g.neovide,
+      scroll_buffer_space = false,
       legacy_computing_symbols_support = false,
       smear_insert_mode = not vim.g.neovide,
+      -- lower the draw interval (default 17 ms)
+      time_interval = 7, -- ms between frames, smaller = smoother :contentReference[oaicite:3]{index=3}
+
+      -- increase spring stiffness (default 0.6 → 0.8) for snappier motion
+      stiffness = 0.8, -- [0,1] :contentReference[oaicite:4]{index=4}
+      trailing_stiffness = 0.7, -- [0,1] :contentReference[oaicite:5]{index=5}
+
+      -- adjust damping (default 0.65 → 0.8) to reduce overshoot
+      damping = 0.8, -- [0,1] :contentReference[oaicite:6]{index=6}
+      damping_insert_mode = 0.8, -- [0,1] :contentReference[oaicite:7]{index=7}
     },
   },
   {
     'anuvyklack/windows.nvim',
     dependencies = { 'anuvyklack/middleclass', 'anuvyklack/animation.nvim' },
+    lazy = false,
     config = function()
       vim.o.winwidth = 10
       vim.o.winminwidth = 10
