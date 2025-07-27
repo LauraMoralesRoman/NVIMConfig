@@ -55,17 +55,18 @@ return {
       -- scroll_buffer_space = not vim.g.neovide,
       scroll_buffer_space = false,
       legacy_computing_symbols_support = false,
-      smear_insert_mode = not vim.g.neovide,
+      -- smear_insert_mode = not vim.g.neovide,
+      smear_insert_mode = false,
       -- lower the draw interval (default 17 ms)
       time_interval = 7, -- ms between frames, smaller = smoother :contentReference[oaicite:3]{index=3}
 
       -- increase spring stiffness (default 0.6 → 0.8) for snappier motion
-      stiffness = 0.8, -- [0,1] :contentReference[oaicite:4]{index=4}
+      stiffness = 1, -- [0,1] :contentReference[oaicite:4]{index=4}
       trailing_stiffness = 0.7, -- [0,1] :contentReference[oaicite:5]{index=5}
 
       -- adjust damping (default 0.65 → 0.8) to reduce overshoot
-      damping = 0.8, -- [0,1] :contentReference[oaicite:6]{index=6}
-      damping_insert_mode = 0.8, -- [0,1] :contentReference[oaicite:7]{index=7}
+      damping = 0.9, -- [0,1] :contentReference[oaicite:6]{index=6}
+      damping_insert_mode = 0.9, -- [0,1] :contentReference[oaicite:7]{index=7}
     },
   },
   {
@@ -76,7 +77,14 @@ return {
       vim.o.winwidth = 10
       vim.o.winminwidth = 10
       vim.o.equalalways = false
-      require('windows').setup {}
+      require('windows').setup {
+        animation = {
+          enable = not vim.g.neovide,
+          duration = 150,
+          fps = 60,
+          easing = 'in_out_sine',
+        },
+      }
     end,
     keys = {
       { '<C-w>z', '<cmd>WindowsMaximize<cr>', desc = 'Maximizes windows' },
