@@ -32,7 +32,7 @@ vim.api.nvim_create_user_command('ToggleInlayHints', function()
   vim.lsp.inlay_hint.enable(inlay_hints_enabled)
 end, { nargs = 0 })
 
-vim.api.nvim_create_user_command('Title', 'norm i-<Esc>vy77po', { nargs = 0 })
+vim.api.nvim_create_user_command('Title', 'norm i=<Esc>vy77po', { nargs = 0 })
 vim.api.nvim_create_user_command('Subtitle', 'norm i-<Esc>vy77po', { nargs = 0 })
 
 -- in your init.lua:
