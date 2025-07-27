@@ -191,6 +191,7 @@ local function embed_selection(opts, generate_description)
   local key_prompt = string.format('%s\nSummarize this text in 10 words', text)
   print 'Generating key'
   run_job_quickfix({ 'llm', '-m', 'qwen2.5:0.5b-instruct', '-c', key_prompt }, nil, function(out)
+    out = string.gsub(out, '\n', ' ')
     local key = string.format('%s [%s]', out, uuid)
     if generate_description then
       vim.notify('Generating metadata for ' .. key, vim.log.levels.INFO)
