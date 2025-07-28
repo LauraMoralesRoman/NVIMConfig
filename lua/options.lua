@@ -50,14 +50,27 @@ end
 
 vim.env.FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow'
 
+vim.api.nvim_set_hl(0, 'Pink', { fg = '#ff7be6', bold = true })
+vim.api.nvim_set_hl(0, 'Gray', { fg = '#525252', italic = true })
+
 vim.opt.statusline = table.concat({
-  ' Laura 󰄛 ',
-  '%f', -- file path
+  '%#Pink# Laura 󰄛 ',
+  '%#Normal# %f ', -- file path
   '%m', -- modified flag
-  '%=', -- right-align
-  '%{v:lua.require("lsp-progress").progress()}', -- ✨ LSP progress
-  '%l:%c %p%%', -- line:col and percent through file
+  '%=', -- right-align rest
+  '%{v:lua.require("lsp-progress").progress()}', -- LSP progress
+  '%l:%c %p%%', -- line:col and percent
+  '%#Gray# %{"[" . strftime("%H:%M:%S") . "]"}', -- ⏰ current time
 }, ' ')
+
+local timer = vim.loop.new_timer()
+timer:start(
+  0,
+  1000,
+  vim.schedule_wrap(function()
+    vim.cmd 'redrawstatus'
+  end)
+)
 
 local signs = {
   { name = 'DiagnosticSignError', text = '' },

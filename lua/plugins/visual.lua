@@ -38,12 +38,14 @@ return {
   {
     'karb94/neoscroll.nvim',
     config = function()
-      require('neoscroll.config').set_mappings {
-        ['<C-u>'] = { 'scroll', { '-vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page up :contentReference[oaicite:17]{index=17}
-        ['<C-d>'] = { 'scroll', { 'vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page down :contentReference[oaicite:18]{index=18}
-        ['<C-b>'] = { 'scroll', { '-vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page up :contentReference[oaicite:19]{index=19}
-        ['<C-f>'] = { 'scroll', { 'vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page down :contentReference[oaicite:20]{index=20}
-      }
+      if not vim.g.neovide then
+        require('neoscroll.config').set_mappings {
+          ['<C-u>'] = { 'scroll', { '-vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page up :contentReference[oaicite:17]{index=17}
+          ['<C-d>'] = { 'scroll', { 'vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page down :contentReference[oaicite:18]{index=18}
+          ['<C-b>'] = { 'scroll', { '-vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page up :contentReference[oaicite:19]{index=19}
+          ['<C-f>'] = { 'scroll', { 'vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page down :contentReference[oaicite:20]{index=20}
+        }
+      end
     end,
   },
   {
