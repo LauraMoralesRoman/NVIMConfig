@@ -60,7 +60,7 @@ vim.opt.statusline = table.concat({
   '%=', -- right-align rest
   '%{v:lua.require("lsp-progress").progress()}', -- LSP progress
   '%l:%c %p%%', -- line:col and percent
-  '%#Gray# %{"[" . strftime("%H:%M:%S") . "]"}', -- ⏰ current time
+  '%#Gray# %{"[" . strftime("%H:%M:%S") . "] "}', -- ⏰ current time
 }, ' ')
 
 local timer = vim.loop.new_timer()
