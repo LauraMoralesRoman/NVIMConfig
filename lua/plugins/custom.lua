@@ -132,4 +132,17 @@ return {
       },
     },
   },
+  {
+    'jbyuki/nabla.nvim',
+    dependencies = {
+      'williamboman/mason.nvim',
+      'nvim-neo-tree/neo-tree.nvim',
+    },
+    config = function()
+      require('nabla').enable_virt {
+        autogen = true, -- automatically find and render math expressions
+        silent = true, -- don’t spam messages
+      }
+    end,
+  },
 }
