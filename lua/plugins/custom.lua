@@ -145,4 +145,14 @@ return {
       }
     end,
   },
+  {
+    'mbbill/undotree',
+    keys = {
+      {
+        '<leader>u',
+        mode = 'n',
+        '<cmd>UndotreeToggle<cr>',
+      },
+    },
+  },
 }
