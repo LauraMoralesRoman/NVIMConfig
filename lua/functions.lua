@@ -190,7 +190,7 @@ local function embed_selection(opts, generate_description)
   local uuid = vim.fn.system('uuidgen'):gsub('%s+', '')
   local key_prompt = string.format('%s\nSummarize this text in 10 words', text)
   print 'Generating key'
-  run_job_quickfix({ 'llm', '-m', 'qwen2.5:0.5b-instruct', '-c', key_prompt }, nil, function(out)
+  run_job_quickfix({ 'llm', '-m', 'gemma3n', '-c', key_prompt }, nil, function(out)
     out = string.gsub(out, '\n', ' ')
     local key = string.format('%s [%s]', out, uuid)
     if generate_description then
