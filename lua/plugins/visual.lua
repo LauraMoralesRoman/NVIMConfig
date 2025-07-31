@@ -36,19 +36,6 @@ return {
     },
   },
   {
-    'karb94/neoscroll.nvim',
-    config = function()
-      if not vim.g.neovide then
-        require('neoscroll.config').set_mappings {
-          ['<C-u>'] = { 'scroll', { '-vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page up :contentReference[oaicite:17]{index=17}
-          ['<C-d>'] = { 'scroll', { 'vim.wo.scroll', 'true', 100 } }, -- 100 ms half‑page down :contentReference[oaicite:18]{index=18}
-          ['<C-b>'] = { 'scroll', { '-vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page up :contentReference[oaicite:19]{index=19}
-          ['<C-f>'] = { 'scroll', { 'vim.api.nvim_win_get_height(0)', 'true', 200 } }, -- 200 ms full page down :contentReference[oaicite:20]{index=20}
-        }
-      end
-    end,
-  },
-  {
     'sphamba/smear-cursor.nvim',
 
     opts = {
@@ -79,14 +66,7 @@ return {
       vim.o.winwidth = 10
       vim.o.winminwidth = 10
       vim.o.equalalways = false
-      require('windows').setup {
-        animation = {
-          enable = not vim.g.neovide,
-          duration = 150,
-          fps = 60,
-          easing = 'in_out_sine',
-        },
-      }
+      require('windows').setup {}
     end,
     keys = {
       { '<C-w>z', '<cmd>WindowsMaximize<cr>', desc = 'Maximizes windows' },
