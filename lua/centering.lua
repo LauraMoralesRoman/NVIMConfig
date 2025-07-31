@@ -53,6 +53,7 @@ local function ToggleCenter()
     height = h,
     style = 'minimal',
     border = 'none',
+    zindex = 1,
   })
 
   -- Apply per-window highlight overrides
