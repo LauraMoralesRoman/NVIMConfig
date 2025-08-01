@@ -526,3 +526,7 @@ vim.api.nvim_create_user_command('Right', function(opts)
   vim.fn.setpos("'>", { 0, opts.line2, 1, 0 })
   right_align()
 end, { range = true })
+
+vim.api.nvim_create_user_command('ToggleFullscreen', function()
+  vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen
+end, { nargs = 0 })
