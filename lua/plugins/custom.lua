@@ -155,4 +155,50 @@ return {
       },
     },
   },
+  {
+    'folke/snacks.nvim',
+    priority = 1000,
+    lazy = false,
+    opts = {
+      image = {
+        formats = {
+          'png',
+          'jpg',
+          'jpeg',
+          'gif',
+          'bmp',
+          'webp',
+          'tiff',
+          'heic',
+          'avif',
+          'mp4',
+          'mov',
+          'avi',
+          'mkv',
+          'webm',
+          'pdf',
+        },
+        doc = {
+          enabled = false,
+        },
+      },
+      bigfile = { enabled = true },
+      quickfile = {},
+      statuscolumn = {},
+      words = {},
+      indent = {
+        indent = {
+
+          only_scope = true, -- only show indent guides of the scope
+          only_current = true, -- only show indent guides in the current window
+        },
+        scope = {
+          enabled = false,
+        },
+        animate = {
+          enabled = false,
+        },
+      },
+    },
+  },
 }

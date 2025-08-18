@@ -65,47 +65,16 @@ vim.api.nvim_create_autocmd('LspProgress', {
 
 vim.api.nvim_set_hl(0, 'CursorWordHighlight', { bg = '#3e4452' }) -- choose any bg/fg you like :contentReference[oaicite:1]{index=1}
 
--- 2. Table to keep track of active match IDs
-local cursor_word_matches = {}
-
--- 3. Create an autocmd group so we can clear it easily if needed
-vim.api.nvim_create_augroup('CursorWordHighlight', { clear = true })
-
--- 4. On CursorHold (and when moving), highlight the word under cursor
-vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorMoved' }, {
-  group = 'CursorWordHighlight',
-  callback = function()
-    -- a) Clear any old matches
-    for _, id in ipairs(cursor_word_matches) do
-      pcall(vim.fn.matchdelete, id)
-    end
-    cursor_word_matches = {}
-
-    -- b) Get the word under cursor
-    local word = vim.fn.expand '<cword>'
-    if word == '' then
-      return
-    end
-
-    -- c) Build the exact‑word pattern
-    local pat = '\\<' .. vim.fn.escape(word, '\\') .. '\\>'
-
-    -- d) Add a new match with highest priority (10)
-    local id = vim.fn.matchadd('CursorWordHighlight', pat, 10)
-    table.insert(cursor_word_matches, id)
-  end,
-})
-
 -- first, create your augroup
 local group = vim.api.nvim_create_augroup('LocalInit', { clear = true })
 
 vim.api.nvim_create_autocmd({ 'VimEnter', 'DirChanged' }, {
   group = group,
-  callback = function()
-    if vim.v.event.scope ~= 'global' then
+  callback = function(opts)
+    if opts.event == 'DirChanged' and vim.v.event.scope ~= 'global' then
       return
     end
-    local cwd = vim.v.event.cwd
+    local cwd = (opts.event == 'DirChanged' and vim.v.event.cwd) or vim.fn.getcwd()
 
     for _, name in ipairs { 'init.vim', 'Session.vim' } do
       local path = cwd .. '/' .. name
