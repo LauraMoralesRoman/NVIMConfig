@@ -112,5 +112,26 @@ return {
       keys = {
         { '<leader>w', '<cmd>Tabby pick_window<cr>', desc = 'Shows workspace picker'}
       }
+    },
+    {
+      'gelguy/wilder.nvim',
+      lazy = false,
+      config = function() 
+        local wilder = require('wilder')
+        wilder.setup({modes = {':', '/', '?'}})
+
+        wilder.set_option('pipeline', {
+          wilder.branch(
+            wilder.cmdline_pipeline({
+              fuzzy = 1,
+              set_pcre2_pattern = 1,
+            }),
+            wilder.python_search_pipeline({
+              pattern = 'fuzzy',
+            })
+          ),
+        })
+
+      end
     }
 }
