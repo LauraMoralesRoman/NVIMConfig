@@ -23,7 +23,10 @@ require('lazy').setup {
 require 'autocmds'
 require 'functions'
 
-vim.cmd [[colorscheme oxocarbon]]
+-- vim.cmd [[colorscheme lackluster-mint]]
+vim.cmd [[colorscheme lackluster-hack]]
+-- local config_path = vim.fn.stdpath("config")
+-- vim.cmd('source ' .. config_path .. '/amber.vim')
 
 require 'langs.godot'
 require 'intro'

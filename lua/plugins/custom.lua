@@ -1,7 +1,6 @@
 local support = require 'support'
 
 return {
-  'nyoom-engineering/oxocarbon.nvim',
   {
     'junegunn/fzf.vim',
     dependencies = { 'junegunn/fzf' },
@@ -25,9 +24,12 @@ return {
         },
       }
     end,
-    formatters_by_ft = {
-      lua = { 'stylua' },
-    },
+formatters_by_ft = {
+  lua = { 'stylua' },
+  rust = { 'rustfmt' },        -- Standard Rust formatter
+  c = { 'clang-format' },      -- Clang-format for C
+  cpp = { 'clang-format' },    -- Clang-format for C++
+}
   },
   {
     'NeogitOrg/neogit',

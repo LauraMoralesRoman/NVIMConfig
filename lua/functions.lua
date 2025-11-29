@@ -164,7 +164,7 @@ local function run_job_quickfix(cmd, input, on_success)
   vim.fn.chanclose(job_id, 'stdin')
 end
 
-local function embed_selection(opts, generate_description)
+local function embed_selection(opts, model)
   local bufnr = vim.api.nvim_get_current_buf()
   local fullpath = vim.api.nvim_buf_get_name(bufnr)
   local filename = vim.fn.fnamemodify(fullpath, ':t')
@@ -188,48 +188,43 @@ local function embed_selection(opts, generate_description)
   local filename = vim.fn.expand '%:p'
 
   local uuid = vim.fn.system('uuidgen'):gsub('%s+', '')
-  local key_prompt = string.format('%s\nSummarize this text in 10 words', text)
+  local key_prompt = string.format('%s\nSummarize this text in 10 words. A really short description', text)
   print 'Generating key'
-  run_job_quickfix({ 'llm', '-m', 'gemma3n', '-c', key_prompt }, nil, function(out)
+  run_job_quickfix({ 'llm', '-m', model, '-c', key_prompt }, nil, function(out)
     out = string.gsub(out, '\n', ' ')
     local key = string.format('%s [%s]', out, uuid)
-    if generate_description then
-      vim.notify('Generating metadata for ' .. key, vim.log.levels.INFO)
-      run_job_quickfix(
-        {
-          'llm',
-          '-s',
-          string.format('Generate a short description. For the file %s at the line %d', filename, start_line),
-          '--schema',
-          '{ "type": "object", "properties": { "description": { "type": "string" }, "filename": { "type": "string" }, "line": { "type": "number" } }, "required": ["description", "filename", "lines"], "additionalProperties": false }',
-        },
-        text,
-        function(metadata)
-          -- on metadata success, launch embedding job likewise
-          run_job_quickfix({ 'llm', 'embed', '--metadata', metadata, '--store', table_name, key }, text, function(_)
-            vim.notify('Embedding saved: ' .. key, vim.log.levels.INFO)
-          end)
-        end
-      )
-    else
-      local metadata = string.format('{"filename": "%s", "line": "%d"}', filename, start_line)
-      run_job_quickfix({ 'llm', 'embed', '--metadata', metadata, '--store', table_name, key }, text, function()
-        vim.notify('Embedding saved: ' .. key, vim.log.levels.INFO)
-      end)
-    end
+    vim.notify('Generating metadata for ' .. key, vim.log.levels.INFO)
+    run_job_quickfix(
+      {
+        'llm',
+        '-m',
+        model,
+        '-s',
+        string.format('Generate a short description. For the file %s at the line %d', filename, start_line),
+        '--schema',
+        '{ "type": "object", "properties": { "description": { "type": "string" }, "filename": { "type": "string" }, "line": { "type": "number" } }, "required": ["description", "filename", "lines"], "additionalProperties": false }',
+      },
+      text,
+      function(metadata)
+        -- on metadata success, launch embedding job likewise
+        run_job_quickfix({ 'llm', 'embed', '--metadata', metadata, '--store', table_name, key }, (metadata .. '\n\n' .. text), function(_)
+          vim.notify('Embedding saved: ' .. key, vim.log.levels.INFO)
+        end)
+      end
+    )
   end)
 end
 
-vim.api.nvim_create_user_command('Embed', function(opts)
-  embed_selection(opts, false)
+vim.api.nvim_create_user_command('OEmbed', function(opts)
+  embed_selection(opts, 'gpt-4o-mini')
 end, {
   range = true, -- allow :<start>,<end>Embed
   nargs = 1, -- require exactly one argument
   desc = 'Embed the given lines: llm embed --save <table> <key>',
 })
 
-vim.api.nvim_create_user_command('EmbedDescription', function(opts)
-  embed_selection(opts, true)
+vim.api.nvim_create_user_command('Embed', function(opts)
+  embed_selection(opts, 'gemma3n')
 end, {
   range = true, -- allow :<start>,<end>Embed
   nargs = 1, -- require exactly one argument

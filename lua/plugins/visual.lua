@@ -1,5 +1,24 @@
 return {
   {
+    {
+        "slugbyte/lackluster.nvim",
+        lazy = false,
+        priority = 1000,
+        init = function()
+            vim.cmd.colorscheme("lackluster")
+            -- vim.cmd.colorscheme("lackluster-hack") -- my favorite
+            -- vim.cmd.colorscheme("lackluster-mint")
+        end,
+    },
+    {
+      "johnpena/badwolf-neovim",
+      lazy = false,
+      priority = 1000,
+      opts = {
+        -- configuration goes here, or leave empty for defaults
+      },
+    },
+    'nyoom-engineering/oxocarbon.nvim',
     'b0o/incline.nvim',
     config = function()
       require('incline').setup {
