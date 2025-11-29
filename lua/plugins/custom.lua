@@ -22,7 +22,44 @@ return {
             ['ctrl-q'] = 'select-all+accept',
           },
         },
+        winopts = {
+            split = "belowright 13new",
+            border = 'none',
+            row = 0,
+            col = 0,
+            preview = {
+                layout = "horizontal",
+                hidden = "hidden"
+            }
+        },
+        fzf_opts = {
+            ['--no-info'] = '',      -- Hide the "10/100" count
+            ['--info'] = 'hidden',   -- Alternative way to hide info
+            ['--header'] = ' ',      -- Hide the helper text (ctrl-c, etc.)
+            ['--no-scrollbar'] = '', -- Hide scrollbar
+          }
       }
+
+      vim.api.nvim_create_autocmd("FileType", {
+          pattern = "fzf",
+          callback = function()
+            -- Hide statusline and other UI elements in fzf window
+            vim.opt_local.laststatus = 0
+            vim.opt_local.showmode = false
+            vim.opt_local.ruler = false
+          end,
+        })
+        vim.api.nvim_create_autocmd("BufLeave", {
+          pattern = "*",
+          callback = function()
+            -- Only restore if we are actually leaving fzf
+            if vim.bo.filetype == "fzf" then
+              vim.opt.laststatus = 2
+              vim.opt.showmode = true
+              vim.opt.ruler = true
+            end
+          end,
+        })
     end,
 formatters_by_ft = {
   lua = { 'stylua' },
