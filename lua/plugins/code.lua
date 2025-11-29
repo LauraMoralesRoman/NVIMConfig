@@ -151,6 +151,11 @@ return {
         mode = 'n',
         '<cmd>Lspsaga code_action<cr>',
       },
+      {
+          '<leader>lo',
+          mode = 'n',
+          '<cmd>Lspsaga outline<cr>'
+      }
     },
   },
   {
