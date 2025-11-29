@@ -40,27 +40,6 @@ return {
             ['--no-scrollbar'] = '', -- Hide scrollbar
           }
       }
-
-      vim.api.nvim_create_autocmd("FileType", {
-          pattern = "fzf",
-          callback = function()
-            -- Hide statusline and other UI elements in fzf window
-            vim.opt_local.laststatus = 0
-            vim.opt_local.showmode = false
-            vim.opt_local.ruler = false
-          end,
-        })
-        vim.api.nvim_create_autocmd("BufLeave", {
-          pattern = "*",
-          callback = function()
-            -- Only restore if we are actually leaving fzf
-            if vim.bo.filetype == "fzf" then
-              vim.opt.laststatus = 3
-              vim.opt.showmode = true
-              vim.opt.ruler = true
-            end
-          end,
-        })
     end,
 formatters_by_ft = {
   lua = { 'stylua' },
