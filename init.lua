@@ -1,3 +1,7 @@
+prev_notify = vim.notify
+vim.notify = function(msg, level, opts)
+end
+
 require 'options'
 require 'keymaps'
 require 'abbrev'
@@ -30,3 +34,5 @@ vim.cmd [[colorscheme lackluster-hack]]
 
 require 'langs.godot'
 require 'intro'
+
+vim.notify = prev_notify
