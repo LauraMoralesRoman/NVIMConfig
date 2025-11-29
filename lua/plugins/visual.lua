@@ -94,4 +94,23 @@ return {
       { '<C-w>=', '<cmd>WindowsEqualize<cr>', desc = 'Maximizes windows' },
     },
   },
+  {
+     'nanozuki/tabby.nvim',
+     lazy = false,
+      opts = {
+          preset = 'active_wins_at_tail',
+          lualine_theme = nil,          -- lualine theme name
+            tab_name = {
+              name_fallback = function(tabid)
+                return tabid
+              end,
+            },
+            buf_name = {
+              mode = 'shorten', -- or 'relative', 'tail', 'shorten'
+            },
+      },
+      keys = {
+        { '<leader>w', '<cmd>Tabby pick_window<cr>', desc = 'Shows workspace picker'}
+      }
+    }
 }
