@@ -23,8 +23,9 @@ return {
           },
         },
         winopts = {
-            split = "belowright 13new",
+            split = "botright 13new",
             border = 'none',
+            width = 1,
             row = 0,
             col = 0,
             preview = {
@@ -54,7 +55,7 @@ return {
           callback = function()
             -- Only restore if we are actually leaving fzf
             if vim.bo.filetype == "fzf" then
-              vim.opt.laststatus = 2
+              vim.opt.laststatus = 3
               vim.opt.showmode = true
               vim.opt.ruler = true
             end
