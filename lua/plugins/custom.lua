@@ -23,7 +23,7 @@ return {
           },
         },
         winopts = {
-            split = "botright 13new",
+            split = "botright 10new",
             border = 'none',
             width = 1,
             row = 0,

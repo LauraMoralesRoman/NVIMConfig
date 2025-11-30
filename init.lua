@@ -22,6 +22,7 @@ require('lazy').setup {
   require 'plugins.custom',
   require 'plugins.overhaul',
   require 'plugins.visual',
+  require 'plugins.debugger'
 }
 
 require 'autocmds'
@@ -33,6 +34,7 @@ vim.cmd [[colorscheme lackluster-hack]]
 -- vim.cmd('source ' .. config_path .. '/amber.vim')
 
 require 'langs.godot'
+require 'langs.cpp'
 require 'intro'
 
 vim.notify = prev_notify
