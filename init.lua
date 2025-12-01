@@ -3,7 +3,6 @@ vim.notify = function(msg, level, opts)
 end
 
 require 'options'
-require 'keymaps'
 require 'abbrev'
 require 'centering'
 
@@ -29,12 +28,13 @@ require 'autocmds'
 require 'functions'
 
 -- vim.cmd [[colorscheme lackluster-mint]]
-vim.cmd [[colorscheme lackluster-hack]]
+vim.cmd [[colorscheme lackluster-night]]
 -- local config_path = vim.fn.stdpath("config")
 -- vim.cmd('source ' .. config_path .. '/amber.vim')
 
 require 'langs.godot'
 require 'langs.cpp'
 require 'intro'
+require 'keymaps'
 
 vim.notify = prev_notify

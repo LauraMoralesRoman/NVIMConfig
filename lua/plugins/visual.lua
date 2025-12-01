@@ -129,6 +129,26 @@ return {
           ),
         })
 
+        wilder.set_option('renderer', wilder.popupmenu_renderer(
+          wilder.popupmenu_border_theme({
+            highlighter = {
+                wilder.lua_pcre2_highlighter(), -- requires `luarocks install pcre2`
+                wilder.lua_fzy_highlighter(),   -- requires fzy-lua-native vim plugin found
+                                                -- at https://github.com/romgrk/fzy-lua-native
+            },
+            highlights = {
+              accent = wilder.make_hl('WilderAccent', 'Pmenu', {{a = 1}, {a = 1}, {foreground = '#f4468f'}}),
+            },
+            -- 'single', 'double', 'rounded' or 'solid'
+            -- can also be a list of 8 characters, see :h wilder#popupmenu_border_theme() for more details
+            border = 'rounded',
+            min_width = '100%',
+            highlighter = wilder.basic_highlighter(),
+            left = {' ', wilder.popupmenu_devicons()},
+            right = {' ', wilder.popupmenu_scrollbar()},
+          })
+        ))
+
       end
     },
     {

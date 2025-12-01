@@ -6,7 +6,7 @@ vim.g.maplocalleader = ' '
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.mouse = ''
-vim.opt.cmdheight = 1
+vim.opt.cmdheight = 0
 
 vim.opt.ignorecase = true
 vim.opt.smartcase = true

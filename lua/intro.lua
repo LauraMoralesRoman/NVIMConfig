@@ -52,13 +52,17 @@ local function show_centered_intro()
     row = row,
     col = col,
     style = 'minimal',
-    border = 'rounded',
     focusable = false,
     zindex = 1000000,
   }) -- leave enter/focus defaults :contentReference[oaicite:7]{index=7}
 
+    vim.api.nvim_set_hl(0, 'FloatBackground', {
+      bg = '#242424',  -- Your background color
+      fg = '#cccccc',  -- Text color (optional)
+    })
+
   -- 8. Apply per-window transparency & highlight
-  vim.api.nvim_win_set_option(float_win, 'winhighlight', 'Normal:Normal,Normal:Normal') -- override only this float’s highlights
+  vim.api.nvim_win_set_option(float_win, 'winhighlight', 'Normal:FloatBackground') -- override only this float’s highlights
 
   -- 9. Make buffer read‑only and auto‑wipe on close
   vim.api.nvim_buf_set_option(float_buf, 'modifiable', false)
