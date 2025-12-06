@@ -77,6 +77,12 @@ return {
             },
           },
           windows = { indent = 1 },
+          stacks = {
+              mappings = {
+                  open = "<cr>",
+                  expand = 'o'
+              }
+          }
         }
     },
     {

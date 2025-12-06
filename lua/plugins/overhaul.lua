@@ -33,5 +33,23 @@ return {
             { '-',         '<cmd>Oil --float<cr>',   desc = 'Shows file explorer' },
             { '<Leader>-', '<cmd>Oil --float .<cr>', desc = 'Shows file explorer at the root directory' }
         }
+    },
+    {
+        'altermo/nwm',branch='x11',
+        opts = {
+            unfocus_map = '<C-space>'
+        },
+    },
+    {
+      "kelly-lin/ranger.nvim",
+      config = function()
+        require("ranger-nvim").setup({ replace_netrw = true })
+        vim.api.nvim_set_keymap("n", "<leader>ef", "", {
+          noremap = true,
+          callback = function()
+            require("ranger-nvim").open(true)
+          end,
+        })
+      end,
     }
 }

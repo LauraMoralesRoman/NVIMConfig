@@ -46,11 +46,17 @@ return {
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
+      local options = {
+          clangd = {
+              cmd = { 'clangd', '--header-insertion=never' }
+          }
+      }
+
       require('mason').setup()
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
-            local server = {}
+            local server = options[server_name] or {}
             server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
             require('lspconfig')[server_name].setup(server)
           end,
