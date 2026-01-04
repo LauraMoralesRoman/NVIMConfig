@@ -49,6 +49,11 @@ return {
       local options = {
           clangd = {
               cmd = { 'clangd', '--header-insertion=never' }
+          },
+          racket_langserver = {
+              cmd = { 'racket', '--lib', 'racket-langserver' },
+              filetypes = {'racket', 'scheme'},
+              root_markers = {'.git', 'info.rkt'}
           }
       }
 

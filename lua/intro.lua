@@ -118,6 +118,16 @@ vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI', 'InsertEnter', 'Ins
 
 vim.api.nvim_create_user_command('Intro', show_centered_intro, { desc = 'Shows intro' })
 
+running = true
+vim.api.nvim_create_user_command('ToggleIntro', function()
+    running = not running
+    if (running) then
+        idle_timer:stop()
+    else
+        reset_idle_timer()
+    end
+end, { desc = 'Shows intro' })
+
 -- Start timer initially
 reset_idle_timer()
 

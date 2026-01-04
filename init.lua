@@ -21,7 +21,8 @@ require('lazy').setup {
   require 'plugins.custom',
   require 'plugins.overhaul',
   require 'plugins.visual',
-  require 'plugins.debugger'
+  require 'plugins.debugger',
+  require 'langs.racket'
 }
 
 require 'autocmds'

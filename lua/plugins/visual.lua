@@ -11,6 +11,9 @@ return {
         end,
     },
     {
+        "p00f/alabaster.nvim"
+    },
+    {
       "johnpena/badwolf-neovim",
       lazy = false,
       priority = 1000,
@@ -164,5 +167,9 @@ return {
             vim.keymap.set('n', '<leader>dk', function() require("duck").cook() end, {})
             vim.keymap.set('n', '<leader>da', function() require("duck").cook_all() end, {})
         end
+    },
+    {
+        "xiyaowong/transparent.nvim",
+        lazy = false
     }
 }
