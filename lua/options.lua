@@ -17,7 +17,7 @@ vim.opt.splitbelow = true
 -- Formatting options
 vim.opt_global.shiftwidth = 4
 vim.opt_global.tabstop = 4
-vim.opt_global.expandtab = true
+vim.opt_global.expandtab = false
 vim.opt.wrap = false
 vim.opt.breakindent = true
 vim.opt.undofile = true
@@ -37,7 +37,7 @@ vim.opt.listchars = {
 vim.opt.cursorline = false
 vim.opt.hlsearch = true
 vim.opt.laststatus = 3
-vim.opt.showtabline = 2
+vim.opt.showtabline = 1
 
 -- GUI options
 

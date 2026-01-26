@@ -1,10 +1,5 @@
-prev_notify = vim.notify
-vim.notify = function(msg, level, opts)
-end
-
 require 'options'
-require 'abbrev'
-require 'centering'
+require 'keymaps'
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -16,26 +11,8 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup {
-  require 'plugins.basic',
-  require 'plugins.code',
-  require 'plugins.custom',
-  require 'plugins.overhaul',
-  require 'plugins.visual',
-  require 'plugins.debugger',
-  require 'langs.racket'
+    require 'plugins.code',
+    require 'plugins.basic',
+    require 'plugins.extra',
+    -- require 'plugins.llm'
 }
-
-require 'autocmds'
-require 'functions'
-
--- vim.cmd [[colorscheme lackluster-mint]]
-vim.cmd [[colorscheme lackluster-night]]
--- local config_path = vim.fn.stdpath("config")
--- vim.cmd('source ' .. config_path .. '/amber.vim')
-
-require 'langs.godot'
-require 'langs.cpp'
-require 'intro'
-require 'keymaps'
-
-vim.notify = prev_notify

@@ -29,6 +29,21 @@ return {
           { name = 'path' },
         },
       }
+
+      cmp.setup.cmdline(':', {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = {
+            { name = 'path' },
+            { name = 'cmdline' },
+          },
+        })
+
+        cmp.setup.cmdline({ '/', '?' }, {
+          mapping = cmp.mapping.preset.cmdline(),
+          sources = {
+            { name = 'buffer' },
+          },
+        })
     end,
   },
   {
@@ -77,16 +92,6 @@ return {
       },
       indent = { enable = true },
     },
-    config = function()
-      require('nvim-treesitter.install').prefer_git = true
-
-      vim.api.nvim_create_autocmd('BufEnter', {
-        pattern = '*',
-        callback = function()
-          vim.cmd 'TSBufEnable highlight'
-        end,
-      })
-    end,
   },
   {
     'stevearc/conform.nvim',
@@ -163,3 +168,4 @@ return {
   },
 }
 }
+
