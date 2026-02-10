@@ -17,3 +17,5 @@ require('lazy').setup {
     require 'plugins.extra',
     -- require 'plugins.llm'
 }
+
+require 'commands'
