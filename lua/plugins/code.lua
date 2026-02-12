@@ -32,43 +32,77 @@ return {
     end,
   },
   {
-    'neovim/nvim-lspconfig',
-    dependencies = {
-      -- Automatically install LSPs and related tools to stdpath for Neovim
-      { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
-      'williamboman/mason-lspconfig.nvim',
-      'WhoIsSethDaniel/mason-tool-installer.nvim',
-
-      -- Useful status updates for LSP. (bottom updates)
-      -- { 'j-hui/fidget.nvim', opts = {} },
-    },
-    config = function()
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
-
-      local options = {
-          clangd = {
-              cmd = { 'clangd', '--header-insertion=never' }
-          },
-          racket_langserver = {
-              cmd = { 'racket', '--lib', 'racket-langserver' },
-              filetypes = {'racket', 'scheme'},
-              root_markers = {'.git', 'info.rkt'}
-          }
-      }
-
-      require('mason').setup()
-      require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            local server = options[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
-        },
-      }
-    end,
+  'neovim/nvim-lspconfig',
+  dependencies = {
+    { 'williamboman/mason.nvim', config = true },
+    'williamboman/mason-lspconfig.nvim',
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
   },
+  config = function()
+    -- Get capabilities from nvim-cmp
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+    -- Setup Mason first
+    require('mason').setup()
+    require('mason-lspconfig').setup {
+      ensure_installed = { 'clangd' },  -- Optional: list servers to auto-install
+    }
+
+    -- Configure each server directly (this is the new way)
+    require('lspconfig').clangd.setup {
+      cmd = { 'clangd', '--header-insertion=never' },
+      capabilities = capabilities,
+    }
+
+    require('lspconfig').racket_langserver.setup {
+      cmd = { 'racket', '--lib', 'racket-langserver' },
+      filetypes = {'racket', 'scheme'},
+      root_dir = require('lspconfig.util').root_pattern('.git', 'info.rkt'),
+      capabilities = capabilities,
+    }
+  end,
+},
+{
+  'neovim/nvim-lspconfig',
+  dependencies = {
+    { 'williamboman/mason.nvim', config = true },
+    'williamboman/mason-lspconfig.nvim',
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
+  },
+  config = function()
+    -- Get capabilities from nvim-cmp
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
+
+    -- Setup Mason
+    require('mason').setup()
+    require('mason-lspconfig').setup {
+      ensure_installed = { 'clangd' },
+    }
+
+    -- Configure clangd with custom options
+    vim.lsp.config.clangd = {
+      cmd = { 'clangd', '--header-insertion=never' },
+      filetypes = { 'c', 'cpp', 'objc', 'objcpp' },
+      root_markers = { '.clangd', '.clang-tidy', '.clang-format', 'compile_commands.json', 'compile_flags.txt', '.git' },
+      capabilities = capabilities,
+    }
+
+    -- Configure racket_langserver
+    vim.lsp.config.racket_langserver = {
+      cmd = { 'racket', '--lib', 'racket-langserver' },
+      filetypes = { 'racket', 'scheme' },
+      root_markers = { '.git', 'info.rkt' },
+      capabilities = capabilities,
+    }
+
+    -- Enable the LSPs
+    vim.lsp.enable('clangd')
+    vim.lsp.enable('racket_langserver')
+  end,
+},
+
   {
     'nvim-treesitter/nvim-treesitter',
     opts = {
