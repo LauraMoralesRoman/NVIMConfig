@@ -105,4 +105,8 @@ vim.diagnostic.config {
       return '' -- Fallback: no prefix
     end,
   },
+  signs = true,
+  underline = true,
+  update_in_insert = true,  -- or false if you prefer, but this makes it obvious that updates are happening
+  severity_sort = true,
 }

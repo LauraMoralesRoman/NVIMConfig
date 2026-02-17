@@ -60,11 +60,14 @@ return {
       require('mason').setup()
       require('mason-lspconfig').setup {
         handlers = {
-          function(server_name)
-            local server = options[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
+			function(server_name)
+			  local server = options[server_name] or {}
+			  server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+			  server.flags = vim.tbl_deep_extend('force', server.flags or {}, {
+				debounce_text_changes = 150,
+			  })
+			  require('lspconfig')[server_name].setup(server)
+			end
         },
       }
     end,
@@ -104,41 +107,41 @@ return {
       },
     },
   },
-  {
-    'nvimdev/lspsaga.nvim',
-    lazy = false,
-    config = function()
-      require('lspsaga').setup {
-        ui = {
-          code_action = '󰌵',
-        },
-        symbol_in_winbar = {
-          enable = enable,
-        },
-      }
-    end,
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter', -- optional
-      'nvim-tree/nvim-web-devicons', -- optional
-    },
-    keys = {
-      {
-        '<leader>lr',
-        mode = 'n',
-        '<cmd>Lspsaga rename<cr>',
-      },
-      {
-        '<leader>la',
-        mode = 'n',
-        '<cmd>Lspsaga code_action<cr>',
-      },
-      {
-          '<leader>lo',
-          mode = 'n',
-          '<cmd>Lspsaga outline<cr>'
-      }
-    },
-  },
+  -- {
+  --   'nvimdev/lspsaga.nvim',
+  --   lazy = false,
+  --   config = function()
+  --     require('lspsaga').setup {
+  --       ui = {
+  --         code_action = '󰌵',
+  --       },
+  --       symbol_in_winbar = {
+  --         enable = enable,
+  --       },
+  --     }
+  --   end,
+  --   dependencies = {
+  --     'nvim-treesitter/nvim-treesitter', -- optional
+  --     'nvim-tree/nvim-web-devicons', -- optional
+  --   },
+  --   keys = {
+  --     {
+  --       '<leader>lr',
+  --       mode = 'n',
+  --       '<cmd>Lspsaga rename<cr>',
+  --     },
+  --     {
+  --       '<leader>la',
+  --       mode = 'n',
+  --       '<cmd>Lspsaga code_action<cr>',
+  --     },
+  --     {
+  --         '<leader>lo',
+  --         mode = 'n',
+  --         '<cmd>Lspsaga outline<cr>'
+  --     }
+  --   },
+  -- },
   {
     'linrongbin16/lsp-progress.nvim',
     config = function()
