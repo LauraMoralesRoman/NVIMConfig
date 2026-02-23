@@ -26,7 +26,7 @@ return {
 			  disable_default_keybindings = 0, -- keep 't' to toggle collapse, 'e' to open files, etc.
 			  open = false,
 			  side = "left",
-			  initial_width = 35,
+			  initial_width = 30,
 			  hide_statusline = false,
 			  update_interval = 1000,
 
