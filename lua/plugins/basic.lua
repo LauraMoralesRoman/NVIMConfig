@@ -39,6 +39,7 @@ return {
             ['--no-scrollbar'] = '', -- Hide scrollbar
           }
       }
+	  require("fzf-lua").register_ui_select()
     end,
 formatters_by_ft = {
   lua = { 'stylua' },

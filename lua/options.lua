@@ -14,6 +14,9 @@ vim.opt.smartcase = true
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
+vim.opt.colorcolumn="+1"
+vim.opt.textwidth=80
+
 -- Formatting options
 vim.opt_global.shiftwidth = 4
 vim.opt_global.tabstop = 4

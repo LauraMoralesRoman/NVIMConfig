@@ -107,41 +107,41 @@ return {
       },
     },
   },
-  -- {
-  --   'nvimdev/lspsaga.nvim',
-  --   lazy = false,
-  --   config = function()
-  --     require('lspsaga').setup {
-  --       ui = {
-  --         code_action = '󰌵',
-  --       },
-  --       symbol_in_winbar = {
-  --         enable = enable,
-  --       },
-  --     }
-  --   end,
-  --   dependencies = {
-  --     'nvim-treesitter/nvim-treesitter', -- optional
-  --     'nvim-tree/nvim-web-devicons', -- optional
-  --   },
-  --   keys = {
-  --     {
-  --       '<leader>lr',
-  --       mode = 'n',
-  --       '<cmd>Lspsaga rename<cr>',
-  --     },
-  --     {
-  --       '<leader>la',
-  --       mode = 'n',
-  --       '<cmd>Lspsaga code_action<cr>',
-  --     },
-  --     {
-  --         '<leader>lo',
-  --         mode = 'n',
-  --         '<cmd>Lspsaga outline<cr>'
-  --     }
-  --   },
-  -- },
+  {
+    'nvimdev/lspsaga.nvim',
+    lazy = false,
+    config = function()
+      require('lspsaga').setup {
+        ui = {
+          code_action = '󰌵',
+        },
+        symbol_in_winbar = {
+          enable = enable,
+        },
+      }
+    end,
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter', -- optional
+      'nvim-tree/nvim-web-devicons', -- optional
+    },
+    keys = {
+      {
+        '<leader>lr',
+        mode = 'n',
+        '<cmd>Lspsaga rename<cr>',
+      },
+      {
+        '<leader>la',
+        mode = 'n',
+        '<cmd>Lspsaga code_action<cr>',
+      },
+      {
+          '<leader>lo',
+          mode = 'n',
+          '<cmd>Lspsaga outline<cr>'
+      }
+    },
+  },
   {
     'linrongbin16/lsp-progress.nvim',
     config = function()

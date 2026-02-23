@@ -17,6 +17,7 @@ require('lazy').setup {
     require 'plugins.basic',
     require 'plugins.extra',
     -- require 'plugins.llm'
+	require 'plugins.visual'
 }
 
 require 'commands'
