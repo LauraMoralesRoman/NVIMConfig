@@ -82,6 +82,14 @@ return {
         end,
     },
 	{
+		  'kungfusheep/mfd.nvim',
+		  lazy = false,
+		  priority = 1000,
+		  config = function()
+			vim.cmd('colorscheme mfd-stealth')
+		  end,
+		},
+	{
 	  "luckasRanarison/nvim-devdocs",
 	  dependencies = {
 		"nvim-lua/plenary.nvim",

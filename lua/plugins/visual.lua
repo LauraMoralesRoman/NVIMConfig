@@ -24,10 +24,10 @@ return {
 		  config = function()
 			require("sidebar-nvim").setup({
 			  disable_default_keybindings = 0, -- keep 't' to toggle collapse, 'e' to open files, etc.
-			  open = false,
-			  side = "left",
+			  open = true,
+			  side = "right",
 			  initial_width = 30,
-			  hide_statusline = false,
+			  hide_statusline = true,
 			  update_interval = 1000,
 
 			  sections = { "diagnostics", "todos", "git", "buffers" },
