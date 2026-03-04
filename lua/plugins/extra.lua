@@ -78,17 +78,17 @@ return {
         lazy = false,
         priority = 1000,
         init = function()
-            vim.cmd.colorscheme("lackluster-night")
+            vim.cmd.colorscheme("lackluster-mint")
         end,
     },
-	{
-		  'kungfusheep/mfd.nvim',
-		  lazy = false,
-		  priority = 1000,
-		  config = function()
-			vim.cmd('colorscheme mfd-stealth')
-		  end,
-		},
+	-- {
+	-- 	  'kungfusheep/mfd.nvim',
+	-- 	  lazy = false,
+	-- 	  priority = 1000,
+	-- 	  config = function()
+	-- 		vim.cmd('colorscheme mfd-stealth')
+	-- 	  end,
+	-- 	},
 	{
 	  "luckasRanarison/nvim-devdocs",
 	  dependencies = {
