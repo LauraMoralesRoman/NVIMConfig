@@ -40,6 +40,7 @@ vim.keymap.set('n', '<C-c>', '<Esc>')
 
 -- Tools
 vim.keymap.set('n', '<Leader>t', '<cmd>Lspsaga term_toggle<cr>')
+vim.keymap.set('n', '<leader>ss', '<cmd>source init.vim<CR>')
 
 -- LSP
 vim.keymap.set('n', '<Leader>n', '<cmd>cnext<cr>')
