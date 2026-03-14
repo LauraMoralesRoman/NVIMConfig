@@ -78,6 +78,8 @@ local function qf_follow_attach()
         local src_buf = vim.api.nvim_get_current_buf()
         local src_line = vim.api.nvim_win_get_cursor(src_win)[1] - 1 -- 0-indexed
 
+		vim.cmd 'norm zz'
+
         vim.api.nvim_buf_clear_namespace(src_buf, qf_follow_ns, 0, -1)
         vim.api.nvim_buf_set_extmark(src_buf, qf_follow_ns, src_line, 0, {
           line_hl_group = "CurSearch", -- swap for any highlight group you prefer
