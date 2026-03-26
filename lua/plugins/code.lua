@@ -47,31 +47,31 @@ return {
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       local options = {
-          clangd = {
-              cmd = { 'clangd', '--header-insertion=never' }
-          },
-          racket_langserver = {
-              cmd = { 'racket', '--lib', 'racket-langserver' },
-              filetypes = {'racket', 'scheme'},
-              root_markers = {'.git', 'info.rkt'}
-          }
+        clangd = {
+          cmd = { 'clangd', '--header-insertion=never' },
+        },
+        racket_langserver = {
+          cmd = { 'racket', '--lib', 'racket-langserver' },
+          filetypes = { 'racket', 'scheme' },
+          root_markers = { '.git', 'info.rkt' },
+        },
       }
 
       require('mason').setup()
       require('mason-lspconfig').setup {
         handlers = {
-			function(server_name)
-			  local server = options[server_name] or {}
-			  server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-			  server.flags = vim.tbl_deep_extend('force', server.flags or {}, {
-				debounce_text_changes = 150,
-			  })
-			  require('lspconfig')[server_name].setup(server)
-			end
+          function(server_name)
+            local server = options[server_name] or {}
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            server.flags = vim.tbl_deep_extend('force', server.flags or {}, {
+              debounce_text_changes = 150,
+            })
+            require('lspconfig')[server_name].setup(server)
+          end,
         },
       }
     end,
-},
+  },
   {
     'nvim-treesitter/nvim-treesitter',
     opts = {
@@ -136,10 +136,10 @@ return {
         '<cmd>Lspsaga code_action<cr>',
       },
       {
-          '<leader>lo',
-          mode = 'n',
-          '<cmd>Lspsaga outline<cr>'
-      }
+        '<leader>lo',
+        mode = 'n',
+        '<cmd>Lspsaga outline<cr>',
+      },
     },
   },
   {
@@ -148,12 +148,11 @@ return {
       require('lsp-progress').setup()
     end,
   },
-{
-  "ray-x/lsp_signature.nvim",
-  event = "InsertEnter",
-  opts = {
-    hint_enable = false,  -- disable virtual text
+  {
+    'ray-x/lsp_signature.nvim',
+    event = 'InsertEnter',
+    opts = {
+      hint_enable = false, -- disable virtual text
+    },
   },
 }
-}
-

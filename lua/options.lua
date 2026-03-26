@@ -14,8 +14,8 @@ vim.opt.smartcase = true
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
-vim.opt.colorcolumn="+1"
-vim.opt.textwidth=80
+vim.opt.colorcolumn = '+1'
+vim.opt.textwidth = 80
 
 -- Formatting options
 vim.opt_global.shiftwidth = 4
@@ -110,6 +110,6 @@ vim.diagnostic.config {
   },
   signs = true,
   underline = true,
-  update_in_insert = true,  -- or false if you prefer, but this makes it obvious that updates are happening
+  update_in_insert = true, -- or false if you prefer, but this makes it obvious that updates are happening
   severity_sort = true,
 }

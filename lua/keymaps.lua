@@ -15,16 +15,16 @@ vim.keymap.set('n', '|', '<cmd>vertical belowright split<cr>', { desc = 'Vertica
 vim.keymap.set('n', '\\', '<cmd>belowright split<cr>', { desc = 'Horizontal split' })
 
 vim.keymap.set('n', '<C-M-k>', function()
-    require('smart-splits').resize_up()
+  require('smart-splits').resize_up()
 end, { desc = 'Resize split up', noremap = true, silent = true })
 vim.keymap.set('n', '<C-M-j>', function()
-    require('smart-splits').resize_down()
+  require('smart-splits').resize_down()
 end, { desc = 'Resize split down', noremap = true, silent = true })
 vim.keymap.set('n', '<C-M-h>', function()
-    require('smart-splits').resize_left()
+  require('smart-splits').resize_left()
 end, { desc = 'Resize split left', noremap = true, silent = true })
 vim.keymap.set('n', '<C-M-l>', function()
-    require('smart-splits').resize_right()
+  require('smart-splits').resize_right()
 end, { desc = 'Resize split right', noremap = true, silent = true })
 
 -- Diagnostics
@@ -48,7 +48,7 @@ vim.keymap.set('n', '<Leader>p', '<cmd>cprevious<cr>')
 
 -- Show all symbols in the current buffer, listed in quickfix
 vim.keymap.set('n', '<Leader>ls', function()
-    vim.lsp.buf.document_symbol()
+  vim.lsp.buf.document_symbol()
 end, { desc = 'List document symbols' })
 
 -- Use VIM bettwe, idiot
@@ -58,25 +58,43 @@ vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 local function open_in_tab_with_w3m()
-    local url = vim.fn.expand('<cfile>') -- get URL/text under cursor
-    vim.cmd(string.format('tabnew | terminal w3m %s', url))
+  local url = vim.fn.expand '<cfile>' -- get URL/text under cursor
+  vim.cmd(string.format('tabnew | terminal w3m %s', url))
 end
 
 vim.keymap.set(
-    'n',  -- mode: normal
-    'gx', -- key sequence
-    open_in_tab_with_w3m,
-    { noremap = true, silent = true }
+  'n', -- mode: normal
+  'gx', -- key sequence
+  open_in_tab_with_w3m,
+  { noremap = true, silent = true }
 )
 
 -- DAP
 
-vim.keymap.set('n', '<Leader>dc', function() require('dap').continue() end)
-vim.keymap.set('n', '<Leader>dn', function() require('dap').step_over() end)
-vim.keymap.set('n', '<Leader>di', function() require('dap').step_into() end)
-vim.keymap.set('n', '<Leader>do', function() require('dap').step_out() end)  -- Shift+F11
-vim.keymap.set('n', '<Leader>db', function() require('dap').toggle_breakpoint() end)
-vim.keymap.set('n', '<Leader>dB', function() require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: ')) end)
-vim.keymap.set('n', '<Leader>dr', function() require('dap').repl.open() end)
-vim.keymap.set('n', '<Leader>dl', function() require('dap').run_last() end)
-vim.keymap.set({'n', 'v'}, '<Leader>dh', function() require('dapui').eval() end)  -- Hover-like evaluation
+vim.keymap.set('n', '<Leader>dc', function()
+  require('dap').continue()
+end)
+vim.keymap.set('n', '<Leader>dn', function()
+  require('dap').step_over()
+end)
+vim.keymap.set('n', '<Leader>di', function()
+  require('dap').step_into()
+end)
+vim.keymap.set('n', '<Leader>do', function()
+  require('dap').step_out()
+end) -- Shift+F11
+vim.keymap.set('n', '<Leader>db', function()
+  require('dap').toggle_breakpoint()
+end)
+vim.keymap.set('n', '<Leader>dB', function()
+  require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
+end)
+vim.keymap.set('n', '<Leader>dr', function()
+  require('dap').repl.open()
+end)
+vim.keymap.set('n', '<Leader>dl', function()
+  require('dap').run_last()
+end)
+vim.keymap.set({ 'n', 'v' }, '<Leader>dh', function()
+  require('dapui').eval()
+end) -- Hover-like evaluation

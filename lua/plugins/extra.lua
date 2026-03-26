@@ -98,4 +98,21 @@ return {
 	  },
 	  opts = {}
 	},
+	{
+		'nvzone/menu',
+		lazy = true,
+		dependencies = {
+			'nvzone/volt',
+			'nvzone/minty',
+	 	},
+		keys = {
+				{
+					'<C-t>',
+					mode = 'n',
+					function()
+						require('menu').open 'default'
+					end
+				}
+			}
+	}
 }

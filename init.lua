@@ -13,12 +13,10 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup {
-    require 'plugins.code',
-    require 'plugins.basic',
-    require 'plugins.extra',
-    -- require 'plugins.llm'
-	require 'plugins.visual',
-	require 'plugins.debug'
+  require 'plugins.code',
+  require 'plugins.basic',
+  require 'plugins.extra',
+  require 'plugins.visual',
 }
 
 require 'commands'

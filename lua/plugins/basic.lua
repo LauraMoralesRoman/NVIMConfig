@@ -1,5 +1,5 @@
 return {
-	'mrjones2014/smart-splits.nvim',
+  'mrjones2014/smart-splits.nvim',
   {
     'junegunn/fzf.vim',
     dependencies = { 'junegunn/fzf' },
@@ -22,31 +22,31 @@ return {
           },
         },
         winopts = {
-            split = "botright 10new",
-            border = 'none',
-            width = 1,
-            row = 0,
-            col = 0,
-            preview = {
-                layout = "horizontal",
-                hidden = "hidden"
-            }
+          split = 'botright 10new',
+          border = 'none',
+          width = 1,
+          row = 0,
+          col = 0,
+          preview = {
+            layout = 'horizontal',
+            hidden = 'hidden',
+          },
         },
         fzf_opts = {
-            ['--no-info'] = '',      -- Hide the "10/100" count
-            ['--info'] = 'hidden',   -- Alternative way to hide info
-            ['--header'] = ' ',      -- Hide the helper text (ctrl-c, etc.)
-            ['--no-scrollbar'] = '', -- Hide scrollbar
-          }
+          ['--no-info'] = '', -- Hide the "10/100" count
+          ['--info'] = 'hidden', -- Alternative way to hide info
+          ['--header'] = ' ', -- Hide the helper text (ctrl-c, etc.)
+          ['--no-scrollbar'] = '', -- Hide scrollbar
+        },
       }
-	  require("fzf-lua").register_ui_select()
+      require('fzf-lua').register_ui_select()
     end,
-formatters_by_ft = {
-  lua = { 'stylua' },
-  rust = { 'rustfmt' },        -- Standard Rust formatter
-  c = { 'clang-format' },      -- Clang-format for C
-  cpp = { 'clang-format' },    -- Clang-format for C++
-}
+    formatters_by_ft = {
+      lua = { 'stylua' },
+      rust = { 'rustfmt' }, -- Standard Rust formatter
+      c = { 'clang-format' }, -- Clang-format for C
+      cpp = { 'clang-format' }, -- Clang-format for C++
+    },
   },
   {
     'NeogitOrg/neogit',
@@ -77,29 +77,29 @@ formatters_by_ft = {
     event = 'InsertEnter',
     config = true,
   },
-    {
-        'stevearc/oil.nvim',
-        ---@module 'oil'
-        ---@type oil.SetupOpts
-        opts = {
-            float = {
-                padding = 2,
-                max_width = 0.4,
-                max_height = 0.4,
-                border = 'rounded'
-            },
-            keymaps = {
-                ["q"] = "actions.close", -- press q to close the Oil buffer :contentReference[oaicite:2]{index=2}
-            },
-        },
-        -- Optional dependencies
-        dependencies = { { "echasnovski/mini.icons", opts = {} } },
-        -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
-        -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
-        lazy = false,
-        keys = {
-            { '-',         '<cmd>Oil<cr>',   desc = 'Shows file explorer' },
-            { '<Leader>-', '<cmd>Oil .<cr>', desc = 'Shows file explorer at the root directory' }
-        }
-    }
+  {
+    'stevearc/oil.nvim',
+    ---@module 'oil'
+    ---@type oil.SetupOpts
+    opts = {
+      float = {
+        padding = 2,
+        max_width = 0.4,
+        max_height = 0.4,
+        border = 'rounded',
+      },
+      keymaps = {
+        ['q'] = 'actions.close', -- press q to close the Oil buffer :contentReference[oaicite:2]{index=2}
+      },
+    },
+    -- Optional dependencies
+    dependencies = { { 'echasnovski/mini.icons', opts = {} } },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
+    -- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
+    lazy = false,
+    keys = {
+      { '-', '<cmd>Oil<cr>', desc = 'Shows file explorer' },
+      { '<Leader>-', '<cmd>Oil .<cr>', desc = 'Shows file explorer at the root directory' },
+    },
+  },
 }
