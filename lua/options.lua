@@ -15,7 +15,7 @@ vim.opt.splitright = true
 vim.opt.splitbelow = true
 
 vim.opt.colorcolumn = '+1'
-vim.opt.textwidth = 80
+-- vim.opt.textwidth = 80
 
 -- Formatting options
 vim.opt_global.shiftwidth = 4
@@ -58,14 +58,60 @@ vim.env.FZF_DEFAULT_COMMAND = 'rg --files --hidden --follow'
 vim.api.nvim_set_hl(0, 'Pink', { fg = '#ff7be6', bold = true })
 vim.api.nvim_set_hl(0, 'Gray', { fg = '#525252', italic = true })
 
+-- Track session start time
+vim.g.session_start = vim.fn.localtime()
+
+-- Session time formatter - shows only the 2 most relevant units
+local function session_time()
+  local elapsed = vim.fn.localtime() - vim.g.session_start
+  local hours = math.floor(elapsed / 3600)
+  local minutes = math.floor((elapsed % 3600) / 60)
+  local seconds = elapsed % 60
+
+  if hours > 0 then
+    return string.format('%dh %dm', hours, minutes)
+  elseif minutes > 0 then
+    return string.format('%dm %ds', minutes, seconds)
+  else
+    return string.format('%ds', seconds)
+  end
+end
+-- Arglist filename - returns (filename) or empty
+local function arglist_fname()
+  local argc = vim.fn.argc()
+  if argc == 0 then
+    return ''
+  end
+  local fname = vim.fn.fnamemodify(vim.fn.argv(vim.fn.argidx()), ':t')
+  return string.format('(%s)', fname)
+end
+
+-- Arglist count - returns [n/max] or empty
+local function arglist_count()
+  local argc = vim.fn.argc()
+  if argc == 0 then
+    return ''
+  end
+  local current = vim.fn.argidx() + 1
+  return string.format('[%d/%d] ', current, argc)
+end
+
+-- Make it accessible from statusline
+_G.session_time = session_time
+_G.arglist_count = arglist_count
+_G.arglist_fname = arglist_fname
+
 vim.opt.statusline = table.concat({
   '%#Pink# Laura 󰄛 ',
-  '%#Normal# %f ', -- file path
+  '%#Normal# %f', -- file path
   '%m', -- modified flag
+  ' %{v:lua.arglist_count()}', -- arglist counter [n/max]
+  '%#Gray#%{v:lua.arglist_fname()}', -- (filename) in Gray/italic
+  '%#Normal#', -- reset highlight
   '%=', -- right-align rest
   '%{v:lua.require("lsp-progress").progress()}', -- LSP progress
   '%l:%c %p%%', -- line:col and percent
-  '%#Gray# %{"[" . strftime("%H:%M:%S") . "] "}', -- ⏰ current time
+  '%#Gray# %{"[" . v:lua.session_time() . "] "}', -- ⏰ session time
 }, ' ')
 
 local timer = vim.loop.new_timer()

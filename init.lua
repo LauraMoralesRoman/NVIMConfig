@@ -17,6 +17,9 @@ require('lazy').setup {
   require 'plugins.basic',
   require 'plugins.extra',
   require 'plugins.visual',
+  require 'plugins.godot',
 }
 
 require 'commands'
+
+vim.cmd 'colorscheme kanagawa'

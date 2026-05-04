@@ -81,23 +81,6 @@ return {
             vim.cmd.colorscheme("lackluster-mint")
         end,
     },
-	-- {
-	-- 	  'kungfusheep/mfd.nvim',
-	-- 	  lazy = false,
-	-- 	  priority = 1000,
-	-- 	  config = function()
-	-- 		vim.cmd('colorscheme mfd-stealth')
-	-- 	  end,
-	-- 	},
-	{
-	  "luckasRanarison/nvim-devdocs",
-	  dependencies = {
-		"nvim-lua/plenary.nvim",
-		"nvim-telescope/telescope.nvim",
-		"nvim-treesitter/nvim-treesitter",
-	  },
-	  opts = {}
-	},
 	{
 		'nvzone/menu',
 		lazy = true,
