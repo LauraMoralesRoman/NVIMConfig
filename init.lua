@@ -21,5 +21,6 @@ require('lazy').setup {
 }
 
 require 'commands'
+require 'packages'
 
 vim.cmd 'colorscheme kanagawa'

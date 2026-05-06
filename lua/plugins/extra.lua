@@ -11,25 +11,15 @@ return {
     },
   },
   {
-    'mbbill/undotree',
-    keys = {
-      {
-        '<leader>u',
-        mode = 'n',
-        '<cmd>UndotreeToggle<cr>',
-      },
-    },
+      'smjonas/live-command.nvim',
+      config = function()
+          require('live-command').setup {
+              commands = {
+                  Norm = { cmd = 'norm' },
+              },
+          }
+      end,
   },
-    {
-        'smjonas/live-command.nvim',
-        config = function()
-            require('live-command').setup {
-                commands = {
-                    Norm = { cmd = 'norm' },
-                },
-            }
-        end,
-    },
 	{
   'gelguy/wilder.nvim',
   lazy = false,
