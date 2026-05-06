@@ -138,3 +138,25 @@ vim.api.nvim_create_user_command('QfFollowToggle', function()
     vim.cmd 'QfFollowEnable'
   end
 end, { desc = 'Toggle quickfix/loclist cursor follow' })
+
+-- LSP Commands
+vim.api.nvim_create_user_command('LspStart', function()
+  vim.lsp.enable(true)
+  vim.notify('LSP started', vim.log.levels.INFO)
+end, { desc = 'Start LSP for current buffer' })
+
+vim.api.nvim_create_user_command('LspStop', function()
+  vim.lsp.stop_client(vim.lsp.get_clients { bufnr = 0 })
+  vim.notify('LSP stopped', vim.log.levels.INFO)
+end, { desc = 'Stop LSP for current buffer' })
+
+vim.api.nvim_create_user_command('LspRestart', function()
+  local clients = vim.lsp.get_clients { bufnr = 0 }
+  for _, client in ipairs(clients) do
+    client.stop()
+    vim.defer_fn(function()
+      vim.lsp.enable(client.name)
+    end, 100)
+  end
+  vim.notify('LSP restarted', vim.log.levels.INFO)
+end, { desc = 'Restart LSP for current buffer' })
