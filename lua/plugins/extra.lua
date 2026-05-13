@@ -88,7 +88,7 @@ return {
 				}
 			}
 	},
-	{
+  {
   "jla2000/lazydocs.nvim",
   event = "VeryLazy",
   dependencies = {
@@ -97,5 +97,20 @@ return {
     "nvim-treesitter/nvim-treesitter",
   },
   opts = {},
-}
+},
+  {
+    'gsuuon/note.nvim',
+    opts = {},
+    cmd = 'Note',
+    ft = 'note',
+    config = function(_, opts)
+      require('note').setup(opts)
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'note',
+        callback = function()
+          vim.bo.textwidth = 80
+        end,
+      })
+    end,
+  },
 }
