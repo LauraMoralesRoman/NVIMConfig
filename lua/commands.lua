@@ -139,3 +139,57 @@ vim.api.nvim_create_user_command('QfFollowToggle', function()
   end
 end, { desc = 'Toggle quickfix/loclist cursor follow' })
 
+-- LSP management commands
+-- (nvim-lspconfig built-ins may not always register; these are explicit fallbacks)
+
+vim.api.nvim_create_user_command('LspStart', function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients { bufnr = bufnr }
+  if #clients > 0 then
+    vim.notify('LSP already attached: ' .. clients[1].name, vim.log.levels.INFO)
+    return
+  end
+  vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, group = 'lspconfig', modeline = false })
+  vim.defer_fn(function()
+    local new = vim.lsp.get_clients { bufnr = bufnr }
+    if #new > 0 then
+      vim.notify('LSP started: ' .. new[1].name, vim.log.levels.INFO)
+    else
+      local ft = vim.bo[bufnr].filetype
+      vim.notify('No LSP configured for filetype: ' .. ft, vim.log.levels.WARN)
+    end
+  end, 300)
+end, { desc = 'Start LSP for current buffer' })
+
+vim.api.nvim_create_user_command('LspStop', function(opts)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients { bufnr = bufnr }
+  for _, client in ipairs(clients) do
+    client.stop(opts.bang)
+  end
+  if #clients > 0 then
+    vim.notify('Stopped ' .. #clients .. ' LSP client(s)', vim.log.levels.INFO)
+  else
+    vim.notify('No LSP clients attached', vim.log.levels.WARN)
+  end
+end, { bang = true, desc = 'Stop LSP for current buffer' })
+
+vim.api.nvim_create_user_command('LspRestart', function()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients { bufnr = bufnr }
+  local names = {}
+  for _, client in ipairs(clients) do
+    table.insert(names, client.name)
+    client.stop()
+  end
+  vim.defer_fn(function()
+    vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, group = 'lspconfig', modeline = false })
+    vim.defer_fn(function()
+      local new = vim.lsp.get_clients { bufnr = bufnr }
+      if #new > 0 then
+        vim.notify('LSP restarted: ' .. table.concat(names, ', '), vim.log.levels.INFO)
+      end
+    end, 300)
+  end, 150)
+end, { desc = 'Restart LSP for current buffer' })
+
