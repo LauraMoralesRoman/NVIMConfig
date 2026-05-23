@@ -62,17 +62,8 @@ return {
     }))
   end
 },
-
-    {
-        "slugbyte/lackluster.nvim",
-        lazy = false,
-        priority = 1000,
-        init = function()
-            vim.cmd.colorscheme("lackluster-mint")
-        end,
-    },
-	{
-		'nvzone/menu',
+{
+	'nvzone/menu',
 		lazy = true,
 		dependencies = {
 			'nvzone/volt',
