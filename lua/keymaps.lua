@@ -39,7 +39,6 @@ vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true }) -- Exit termi
 vim.keymap.set('n', '<C-c>', '<Esc>')
 
 -- Tools
-vim.keymap.set('n', '<Leader>t', '<cmd>Lspsaga term_toggle<cr>')
 vim.keymap.set('n', '<leader>ss', '<cmd>source init.vim<CR>')
 
 -- LSP

@@ -139,6 +139,12 @@ return {
         mode = 'n',
         '<cmd>Lspsaga outline<cr>',
       },
+      {
+        '<Leader>t',
+        mode = 'n',
+        '<cmd>Lspsaga term_toggle<cr>',
+        desc = 'Toggle floating terminal',
+      },
     },
   },
   {
