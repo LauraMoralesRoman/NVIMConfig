@@ -22,7 +22,7 @@ return {
   },
 	{
   'gelguy/wilder.nvim',
-  lazy = false,
+  event = 'CmdlineEnter',
   dependencies = {
 	"romgrk/fzy-lua-native"
   },
