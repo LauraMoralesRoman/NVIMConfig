@@ -74,6 +74,7 @@ return {
   },
   {
     'nvim-treesitter/nvim-treesitter',
+    event = { 'BufReadPost', 'BufNewFile' },
     opts = {
       highlight = {
         enable = true,
