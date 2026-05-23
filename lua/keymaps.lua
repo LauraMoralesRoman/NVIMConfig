@@ -53,6 +53,10 @@ vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 local function open_in_tab_with_w3m()
+  if vim.fn.executable('w3m') == 0 then
+    vim.notify('w3m not found in PATH', vim.log.levels.WARN)
+    return
+  end
   local url = vim.fn.expand '<cfile>' -- get URL/text under cursor
   vim.cmd(string.format('tabnew | terminal w3m %s', url))
 end
@@ -63,9 +67,3 @@ vim.keymap.set(
   open_in_tab_with_w3m,
   { noremap = true, silent = true }
 )
-
--- DAP
-
-vim.keymap.set('n', '<Leader>dc', function()
-  require('dap').continue()
-end)
