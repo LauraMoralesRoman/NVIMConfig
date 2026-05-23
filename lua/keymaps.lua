@@ -46,11 +46,6 @@ vim.keymap.set('n', '<leader>ss', '<cmd>source init.vim<CR>')
 vim.keymap.set('n', '<Leader>n', '<cmd>cnext<cr>')
 vim.keymap.set('n', '<Leader>p', '<cmd>cprevious<cr>')
 
--- Show all symbols in the current buffer, listed in quickfix
-vim.keymap.set('n', '<Leader>ls', function()
-  vim.lsp.buf.document_symbol()
-end, { desc = 'List document symbols' })
-
 -- Use VIM bettwe, idiot
 vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
