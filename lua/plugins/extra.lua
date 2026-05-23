@@ -5,7 +5,7 @@ return {
     config = function()
       require('icon-picker').setup { disable_legacy_commands = true }
     end,
-    commands = {
+    cmd = {
       'IconPickerInsert',
       'IconPickerNormal',
       'IconPickerYank',
