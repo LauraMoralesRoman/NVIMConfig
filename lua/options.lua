@@ -101,6 +101,14 @@ _G.session_time = session_time
 _G.arglist_count = arglist_count
 _G.arglist_fname = arglist_fname
 
+_G.lsp_progress_safe = function()
+  local ok, lsp_prog = pcall(require, 'lsp-progress')
+  if ok then
+    return lsp_prog.progress()
+  end
+  return ''
+end
+
 vim.opt.statusline = table.concat({
   '%#Pink# Laura 󰄛 ',
   '%#Normal# %f', -- file path
@@ -109,7 +117,7 @@ vim.opt.statusline = table.concat({
   '%#Gray#%{v:lua.arglist_fname()}', -- (filename) in Gray/italic
   '%#Normal#', -- reset highlight
   '%=', -- right-align rest
-  '%{v:lua.require("lsp-progress").progress()}', -- LSP progress
+  '%{v:lua.lsp_progress_safe()}', -- LSP progress
   '%l:%c %p%%', -- line:col and percent
   '%#Gray# %{"[" . v:lua.session_time() . "] "}', -- ⏰ session time
 }, ' ')
