@@ -1,8 +1,7 @@
 return {
   'mrjones2014/smart-splits.nvim',
   {
-    'junegunn/fzf.vim',
-    dependencies = { 'junegunn/fzf' },
+    'ibhagwan/fzf-lua',
     keys = {
       { '<Leader><Leader>', '<cmd>FzfLua files<cr>', desc = 'Find files' },
       { '<Leader>,', '<cmd>FzfLua buffers<cr>', desc = 'Find buffers' },
