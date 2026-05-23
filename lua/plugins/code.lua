@@ -115,7 +115,7 @@ return {
           code_action = '󰌵',
         },
         symbol_in_winbar = {
-          enable = enable,
+          enable = false,
         },
       }
     end,
