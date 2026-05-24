@@ -183,7 +183,7 @@ vim.api.nvim_create_user_command('LspRestart', function()
     client.stop()
   end
   vim.defer_fn(function()
-    vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, group = 'lspconfig', modeline = false })
+    vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, modeline = false })
     vim.defer_fn(function()
       local new = vim.lsp.get_clients { bufnr = bufnr }
       if #new > 0 then
