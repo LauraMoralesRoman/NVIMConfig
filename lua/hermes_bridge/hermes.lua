@@ -90,6 +90,77 @@ function M.eval(expr)
 end
 
 -- ---------------------------------------------------------------------------
+-- Remote state inspection (queried by Hermes via --remote-expr).
+-- ---------------------------------------------------------------------------
+
+-- Return a JSON string describing the full nvim state.
+function M.state_json()
+  local state = {
+    cwd         = vim.fn.getcwd(),
+    mode        = vim.api.nvim_get_mode().mode,
+    buffer      = {
+      name   = vim.api.nvim_buf_get_name(0),
+      number = vim.api.nvim_get_current_buf(),
+      line   = vim.api.nvim_win_get_cursor(0)[1],
+      col    = vim.api.nvim_win_get_cursor(0)[2],
+    },
+    buffers     = {},
+    tabs        = {},
+  }
+
+  -- All listed buffers
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      local name = vim.api.nvim_buf_get_name(buf)
+      if name and #name > 0 then
+        table.insert(state.buffers, name)
+      end
+    end
+  end
+
+  -- All tabs and their window buffers
+  for _, tab in ipairs(vim.api.nvim_list_tabpages()) do
+    local tab_info = { windows = {} }
+    vim.api.nvim_set_current_tabpage(tab)
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+      local buf = vim.api.nvim_win_get_buf(win)
+      local name = vim.api.nvim_buf_get_name(buf)
+      table.insert(tab_info.windows, name)
+    end
+    table.insert(state.tabs, tab_info)
+  end
+
+  -- Restore current tab
+  vim.api.nvim_set_current_tabpage(vim.api.nvim_get_current_tabpage())
+
+  return vim.fn.json_encode(state)
+end
+
+-- Shorthand for quick buffer list (JSON array).
+function M.buffers_json()
+  local names = {}
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) then
+      local name = vim.api.nvim_buf_get_name(buf)
+      if name and #name > 0 then
+        table.insert(names, name)
+      end
+    end
+  end
+  return vim.fn.json_encode(names)
+end
+
+-- Shorthand for current file + cursor (JSON object).
+function M.cursor_json()
+  return vim.fn.json_encode({
+    file = vim.api.nvim_buf_get_name(0),
+    line = vim.api.nvim_win_get_cursor(0)[1],
+    col  = vim.api.nvim_win_get_cursor(0)[2],
+    mode = vim.api.nvim_get_mode().mode,
+  })
+end
+
+-- ---------------------------------------------------------------------------
 -- Setup
 -- ---------------------------------------------------------------------------
 
