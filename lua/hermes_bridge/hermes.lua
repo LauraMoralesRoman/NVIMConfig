@@ -1,15 +1,21 @@
 -- hermes_bridge/hermes.lua
--- Remote-first Hermes <-> Neovim bridge.
--- User command :Hermes <msg> writes a message file for Hermes to consume.
--- Hermes replies / acts by sending commands directly into the running nvim via
---   nvim --server <socket> --remote-send '...<CR>'
+-- Queue-based Hermes <-> Neovim bridge.
 --
--- No polling on the nvim side.  All Hermes->Nvim traffic is push-based.
+-- Nvim side:
+--   :Hermes <msg>   → writes ~/.hermes/nvim-msgs/<timestamp>.json
+--   Each message is a separate queued file (no overwrite).
+--
+-- Hermes side (cron job):
+--   Polls ~/.hermes/nvim-msgs/*.json every 10s while in "neovim mode".
+--   Processes messages in chronological order, deletes after handling.
+--   Replies via nvim --server <sock> --remote-send.
+--
+-- No polling on the nvim side. All Hermes->Nvim traffic is push-based.
 
 local M = {}
 
 -- Send a message from nvim to Hermes.
--- Writes ~/.hermes/nvim-msg.json (consumed by Hermes on its next turn).
+-- Writes ~/.hermes/nvim-msgs/<timestamp>.json.
 function M.send_message(text)
   if not text or #text == 0 then
     vim.notify('[Hermes] empty message', vim.log.levels.WARN)
@@ -17,8 +23,20 @@ function M.send_message(text)
   end
 
   local nvim_listen = vim.v.servername or ''
-  local dir = vim.fn.expand('~/.hermes')
+  local dir = vim.fn.expand('~/.hermes/nvim-msgs')
   vim.fn.mkdir(dir, 'p')
+
+  local ts = os.date('!%Y%m%d_%H%M%S')
+  local fname = dir .. '/' .. ts .. '.json'
+
+  -- If the same second, append counter to avoid collision
+  if vim.fn.filereadable(fname) == 1 then
+    local counter = 0
+    repeat
+      counter = counter + 1
+      fname = dir .. '/' .. ts .. '_' .. counter .. '.json'
+    until vim.fn.filereadable(fname) == 0
+  end
 
   local payload = vim.fn.json_encode {
     message     = text,
@@ -28,15 +46,13 @@ function M.send_message(text)
     buffer      = vim.api.nvim_buf_get_name(0),
   }
 
-  vim.fn.writefile({ payload }, dir .. '/nvim-msg.json')
-  vim.notify('[Hermes] message sent', vim.log.levels.INFO)
+  vim.fn.writefile({ payload }, fname)
+  vim.notify('[Hermes] message queued', vim.log.levels.INFO)
   return true
 end
 
 -- ---------------------------------------------------------------------------
 -- API exposed for Hermes --remote-send injection.
--- Each function below can be triggered from a terminal via:
---   nvim --server <sock> --remote-send ':lua require("hermes_bridge.hermes").FUNC(args)<CR>'
 -- ---------------------------------------------------------------------------
 
 -- Show an on-screen notification.
@@ -58,10 +74,6 @@ function M.command(cmd)
 end
 
 -- Evaluate a Lua expression string and return the result.
--- NOTE: Hermes uses --remote-expr for direct eval when possible.
--- This helper is only needed if Hermes wants to run code that needs nvim
--- globals (vim.api, vim.fn, ...) which are available here but NOT in
--- "nvim --remote-expr" context.
 function M.eval(expr)
   if not expr or #expr == 0 then return nil end
   local fn, err = load('return ' .. expr, 'hermes-eval')
@@ -83,7 +95,7 @@ function M.setup()
     end
   end, {
     nargs = 1,
-    desc  = 'Send an instruction to the Hermes agent',
+    desc  = 'Send an instruction to the Hermes agent (queued)',
   })
 end
 
