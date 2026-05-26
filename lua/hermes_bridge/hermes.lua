@@ -63,6 +63,19 @@ function M.setup()
     nargs = 1,
     desc  = 'Send an instruction to the Hermes agent',
   })
+
+  -- Poll for reply on idle. Reply shown once, then file removed.
+  local poll = function()
+    local reply = M.read_reply()
+    if reply and #reply > 0 then
+      vim.notify('[Hermes] ' .. reply, vim.log.levels.INFO)
+    end
+  end
+
+  vim.api.nvim_create_autocmd('CursorHold', {
+    pattern = '*',
+    callback = poll,
+  })
 end
 
 return M
