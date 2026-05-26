@@ -55,10 +55,15 @@ end
 -- API exposed for Hermes --remote-send injection.
 -- ---------------------------------------------------------------------------
 
--- Show an on-screen notification.
+-- Show an on-screen notification (popup, stays until dismissed).
 function M.notify(text, level)
   level = level or vim.log.levels.INFO
   vim.notify('[Hermes] ' .. text, level)
+end
+
+-- Transient status update in the command line (auto-disappears).
+function M.status(text)
+  vim.api.nvim_echo({ { '[Hermes] ' .. text, 'Comment' } }, false, {})
 end
 
 -- Open a file in the current window.
