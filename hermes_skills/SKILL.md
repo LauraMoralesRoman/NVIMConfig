@@ -124,7 +124,7 @@ For critical milestones or completion, use the persistent popup:
 ```bash
 # Stays on screen until dismissed (or auto-dismisses if using mini.notify)
 nvim --server /tmp/nvim_hermes.sock \
-     --remote-send ':lua require("hermes_bridge.hermes").notify("Done!")<CR>'
+     --remote-send ':lua require("hermes_bridge.hermes").safe_notify("Done!")<CR>'
 ```
 
 **Notification plugin:** `echasnovski/mini.notify` is configured in
@@ -134,7 +134,9 @@ auto-dismisses after 3 seconds (5s for errors).  This replaces the default
 
 **Rule of thumb:**
 - `M.status()` for ongoing progress ("Parsing...", "Writing file...").
-- `M.notify()` for final results or errors.
+- `M.safe_notify()` for final results or errors — queues when you're in
+  Insert/Command/Visual mode and flushes when you return to Normal mode.
+- `M.notify()` only if you are certain the user is in Normal mode.
 
 ### Remote State Inspection
 
