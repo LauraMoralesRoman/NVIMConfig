@@ -14,9 +14,40 @@
 
 local M = {}
 
+-- Return the current visual selection as a Lua string.
+-- Works for char-wise (v) and block-wise (Ctrl-v) selections.
+function M.get_visual_selection()
+  local mode = vim.fn.mode()
+  if mode ~= 'v' and mode ~= 'V' and mode ~= '\22' then
+    return nil
+  end
+
+  local start_line = vim.fn.line("'<")
+  local end_line   = vim.fn.line("'>")
+  local start_col  = vim.fn.col("'<")
+  local end_col    = vim.fn.col("'>")
+
+  if start_line == 0 or end_line == 0 then
+    return nil
+  end
+
+  local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+
+  if #lines == 0 then
+    return nil
+  elseif #lines == 1 then
+    lines[1] = lines[1]:sub(start_col, end_col)
+  else
+    lines[1] = lines[1]:sub(start_col)
+    lines[#lines] = lines[#lines]:sub(1, end_col)
+  end
+
+  return table.concat(lines, '\n')
+end
+
 -- Send a message from nvim to Hermes.
 -- Writes ~/.hermes/nvim-msgs/<timestamp>.json.
-function M.send_message(text)
+function M.send_message(text, selection)
   if not text or #text == 0 then
     vim.notify('[Hermes] empty message', vim.log.levels.WARN)
     return false
@@ -40,6 +71,7 @@ function M.send_message(text)
 
   local payload = vim.fn.json_encode {
     message     = text,
+    selection   = selection,
     timestamp   = os.date('!%Y-%m-%dT%H:%M:%SZ'),
     nvim_socket = nvim_listen,
     cwd         = vim.fn.getcwd(),
@@ -47,7 +79,6 @@ function M.send_message(text)
   }
 
   vim.fn.writefile({ payload }, fname)
-  vim.notify('[Hermes] message queued', vim.log.levels.INFO)
   return true
 end
 
@@ -197,7 +228,8 @@ function M.setup()
 
   vim.api.nvim_create_user_command('Hermes', function(opts)
     if opts.args and #opts.args > 0 then
-      local ok = M.send_message(opts.args)
+      local selection = M.get_visual_selection()
+      local ok = M.send_message(opts.args, selection)
       if ok and not opts.bang then
         vim.notify('[Hermes] message queued', vim.log.levels.INFO)
       end
