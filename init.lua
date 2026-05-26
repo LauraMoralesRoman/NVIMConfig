@@ -18,6 +18,7 @@ require('lazy').setup {
   require 'plugins.extra',
   require 'plugins.visual',
   require 'plugins.godot',
+  require 'plugins.notify',
 }
 
 require 'commands'
