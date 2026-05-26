@@ -167,11 +167,15 @@ end
 function M.setup()
   vim.api.nvim_create_user_command('Hermes', function(opts)
     if opts.args and #opts.args > 0 then
-      M.send_message(opts.args)
+      local ok = M.send_message(opts.args)
+      if ok and not opts.bang then
+        vim.notify('[Hermes] message queued', vim.log.levels.INFO)
+      end
     end
   end, {
     nargs = 1,
-    desc  = 'Send an instruction to the Hermes agent (queued)',
+    bang  = true,
+    desc  = 'Send an instruction to the Hermes agent (queued). Use ! to suppress notification.',
   })
 
   vim.api.nvim_create_user_command('HermesInit', function()
