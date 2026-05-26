@@ -21,6 +21,7 @@ require('lazy').setup {
 }
 
 require 'commands'
+require('hermes_bridge.hermes').setup()
 require 'packages'
 
 vim.cmd 'colorscheme kanagawa'
