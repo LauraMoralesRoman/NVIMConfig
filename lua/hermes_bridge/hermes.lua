@@ -55,10 +55,33 @@ end
 -- API exposed for Hermes --remote-send injection.
 -- ---------------------------------------------------------------------------
 
--- Show an on-screen notification (popup, stays until dismissed).
-function M.notify(text, level)
+-- ---------------------------------------------------------------------------
+-- Notification queue (for when user is in insert/command/visual mode).
+-- ---------------------------------------------------------------------------
+
+local notify_queue = {}
+
+-- Safe notification: checks mode, queues if not in Normal mode.
+function M.safe_notify(text, level)
   level = level or vim.log.levels.INFO
-  vim.notify('[Hermes] ' .. text, level)
+  local mode = vim.api.nvim_get_mode().mode
+
+  -- Only show immediately in Normal mode to avoid interrupting typing
+  if mode == 'n' then
+    vim.notify('[Hermes] ' .. text, level)
+  else
+    -- Queue for later display
+    table.insert(notify_queue, { text = text, level = level })
+  end
+end
+
+-- Flush queued notifications (called on ModeChanged -> Normal).
+function M.flush_notify_queue()
+  if #notify_queue == 0 then return end
+  for _, item in ipairs(notify_queue) do
+    vim.notify('[Hermes] ' .. item.text, item.level)
+  end
+  notify_queue = {}
 end
 
 -- Transient status update in the command line (auto-disappears).
@@ -165,6 +188,13 @@ end
 -- ---------------------------------------------------------------------------
 
 function M.setup()
+  -- Autocmd: flush queued Hermes notifications when returning to Normal mode
+  vim.api.nvim_create_autocmd('ModeChanged', {
+    pattern = '*:n',
+    callback = M.flush_notify_queue,
+    desc = 'Flush queued Hermes notifications when entering Normal mode',
+  })
+
   vim.api.nvim_create_user_command('Hermes', function(opts)
     if opts.args and #opts.args > 0 then
       local ok = M.send_message(opts.args)
