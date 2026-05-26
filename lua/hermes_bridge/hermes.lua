@@ -173,6 +173,20 @@ function M.setup()
     nargs = 1,
     desc  = 'Send an instruction to the Hermes agent (queued)',
   })
+
+  vim.api.nvim_create_user_command('HermesInit', function()
+    -- Open a new tab with a terminal running the Hermes CLI
+    vim.cmd('tabnew')
+    vim.cmd('terminal hermes')
+
+    -- Also queue the activation message so the background bridge wakes up
+    M.send_message('enter neovim mode')
+
+    vim.notify('[Hermes] Bridge tab opened — neovim mode activated', vim.log.levels.INFO)
+  end, {
+    nargs = 0,
+    desc  = 'Open a Hermes terminal tab and activate neovim mode',
+  })
 end
 
 return M
