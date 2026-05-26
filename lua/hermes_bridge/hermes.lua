@@ -54,6 +54,14 @@ function M.read_reply()
   return table.concat(lines, '\n')
 end
 
+-- Show a notification immediately.
+-- Can be triggered remotely via:
+--   nvim --server <sock> --remote-send ':lua require("hermes_bridge.hermes").notify("msg")<CR>'
+function M.notify(text, level)
+  level = level or vim.log.levels.INFO
+  vim.notify('[Hermes] ' .. text, level)
+end
+
 function M.setup()
   vim.api.nvim_create_user_command('Hermes', function(opts)
     if opts.args and #opts.args > 0 then
@@ -68,7 +76,7 @@ function M.setup()
   local poll = function()
     local reply = M.read_reply()
     if reply and #reply > 0 then
-      vim.notify('[Hermes] ' .. reply, vim.log.levels.INFO)
+      M.notify(reply)
     end
   end
 
