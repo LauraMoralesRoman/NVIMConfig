@@ -106,4 +106,20 @@ return {
       })
     end,
   },
+  {
+    'vimwiki/vimwiki',
+    init = function()
+      vim.g.vimwiki_path = '~/vimwiki/'
+      vim.g.vimwiki_syntax = 'markdown'
+      vim.g.vimwiki_ext = 'md'
+    end,
+    config = function()
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'vimwiki',
+        callback = function()
+          vim.bo.textwidth = 80
+        end,
+      })
+    end,
+  }
 }
