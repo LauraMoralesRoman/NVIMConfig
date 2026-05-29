@@ -1,5 +1,9 @@
 return {
   {
+    'tpope/vim-obsession',
+    event = 'VimEnter',
+  },
+  {
     'mrjones2014/smart-splits.nvim',
     event = 'VeryLazy',
   },

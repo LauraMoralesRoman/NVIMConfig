@@ -27,7 +27,7 @@ vim.api.nvim_create_autocmd({ 'VimEnter', 'DirChanged' }, {
     end
     local cwd = (opts.event == 'DirChanged' and vim.v.event.cwd) or vim.fn.getcwd()
 
-    for _, name in ipairs { 'init.vim', 'Session.vim' } do
+    for _, name in ipairs { 'init.vim' } do
       local path = cwd .. '/' .. name
       if vim.loop.fs_stat(path) then
         -- properly escape for Vim’s :source
