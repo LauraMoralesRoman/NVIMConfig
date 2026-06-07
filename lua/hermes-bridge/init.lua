@@ -19,7 +19,7 @@ function M.send_to_listener(payload)
     return false
   end
   local sent = vim.fn.chansend(ch, vim.fn.json_encode(payload) .. "\n")
-  vim.fn.chanclose(ch, "stdin")
+  vim.fn.chanclose(ch)
   return sent > 0
 end
 
