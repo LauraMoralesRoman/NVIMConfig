@@ -56,7 +56,7 @@ function M.send_prompt(text, context, range)
   local payload = { type = "prompt", text = text, context = context or M.get_context() }
   if range then payload.range = range end
   if not M.send_to_listener(payload) then
-    vim.notify("[Hermes] Bridge listener not running (start Neovim Mode first)", vim.log.levels.WARN)
+    vim.notify("[Hermes] Not in Neovim Mode. Use :HermesInit or start nvim with:\n    nvim --listen /tmp/nvim-hermes-bridge.sock", vim.log.levels.ERROR)
   end
 end
 
@@ -114,6 +114,15 @@ function M.setup()
     if ok and mod.open then mod.open()
     else vim.notify("[Hermes] Status buffer not available", vim.log.levels.ERROR) end
   end, { desc = "Open Hermes task status buffer" })
+
+  vim.api.nvim_create_user_command("HermesInit", function()
+    local ok = vim.fn.serverstart("/tmp/nvim-hermes-bridge.sock")
+    if ok and ok ~= "" then
+      vim.notify("[Hermes] Server started on " .. ok, vim.log.levels.INFO)
+    else
+      vim.notify("[Hermes] Could not start server (socket may already be in use)", vim.log.levels.ERROR)
+    end
+  end, { desc = "Start Hermes bridge server on /tmp/nvim-hermes-bridge.sock" })
 end
 
 M.setup()
