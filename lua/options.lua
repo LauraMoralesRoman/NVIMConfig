@@ -116,6 +116,7 @@ vim.opt.statusline = table.concat({
   ' %{v:lua.arglist_count()}', -- arglist counter [n/max]
   '%#Gray#%{v:lua.arglist_fname()}', -- (filename) in Gray/italic
   '%#Normal#', -- reset highlight
+  '%{v:lua.hermes_task_status()}', -- Hermes task progress
   '%=', -- right-align rest
   '%{v:lua.lsp_progress_safe()}', -- LSP progress
   '%l:%c %p%%', -- line:col and percent
