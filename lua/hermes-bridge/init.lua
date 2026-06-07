@@ -56,7 +56,13 @@ function M.send_prompt(text, context, range)
   local payload = { type = "prompt", text = text, context = context or M.get_context() }
   if range then payload.range = range end
   if not M.send_to_listener(payload) then
-    vim.notify("[Hermes] Not in Neovim Mode. Use :HermesInit or start nvim with:\n    nvim --listen /tmp/nvim-hermes-bridge.sock", vim.log.levels.ERROR)
+    local ok, ch = pcall(vim.fn.sockconnect, "pipe", "/tmp/nvim-hermes-bridge.sock")
+    if ok then vim.fn.chanclose(ch) end
+    if ok and ch > 0 then
+      vim.notify("[Hermes] Not in Neovim Mode: tell Hermes 'start neovim mode'", vim.log.levels.ERROR)
+    else
+      vim.notify("[Hermes] No bridge socket: run :HermesInit then tell Hermes 'start neovim mode'", vim.log.levels.ERROR)
+    end
   end
 end
 
@@ -116,11 +122,19 @@ function M.setup()
   end, { desc = "Open Hermes task status buffer" })
 
   vim.api.nvim_create_user_command("HermesInit", function()
-    local ok = vim.fn.serverstart("/tmp/nvim-hermes-bridge.sock")
-    if ok and ok ~= "" then
-      vim.notify("[Hermes] Server started on " .. ok, vim.log.levels.INFO)
+    local sock = "/tmp/nvim-hermes-bridge.sock"
+    local ok, r = pcall(vim.fn.serverstart, sock)
+    if ok and r and r ~= "" then
+      vim.notify("[Hermes] Bridge ready on " .. r, vim.log.levels.INFO)
     else
-      vim.notify("[Hermes] Could not start server (socket may already be in use)", vim.log.levels.ERROR)
+      -- Socket might be stale — try cleaning it and retry once
+      os.remove(sock)
+      ok, r = pcall(vim.fn.serverstart, sock)
+      if ok and r and r ~= "" then
+        vim.notify("[Hermes] Bridge ready on " .. r, vim.log.levels.INFO)
+      else
+        vim.notify("[Hermes] Could not start bridge server", vim.log.levels.ERROR)
+      end
     end
   end, { desc = "Start Hermes bridge server on /tmp/nvim-hermes-bridge.sock" })
 end
