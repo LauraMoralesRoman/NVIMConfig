@@ -55,6 +55,15 @@ return {
           filetypes = { 'racket', 'scheme' },
           root_markers = { '.git', 'info.rkt' },
         },
+        dartls = {
+          cmd = { 'dart', 'language-server', '--protocol=lsp' },
+          filetypes = { 'dart' },
+          root_markers = { 'pubspec.yaml', '.git' },
+          settings = {
+            showTodos = true,
+            completeFunctionCalls = true,
+          },
+        },
       }
 
       require('mason').setup()
@@ -80,6 +89,7 @@ return {
         enable = true,
       },
       indent = { enable = true },
+      ensure_installed = { 'dart' },
     },
   },
   {
@@ -104,6 +114,7 @@ return {
         objcpp = { 'clang-format' }, -- Objective‑C++ files
         cuda = { 'clang-format' }, -- CUDA source files
         proto = { 'clang-format' }, -- Protocol Buffers
+        dart = { 'dart_format' }, -- Dart / Flutter
       },
     },
   },
