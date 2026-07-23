@@ -26,4 +26,5 @@ require 'hermes-bridge.notify'
 require 'commands'
 require 'packages'
 
-vim.cmd 'colorscheme kanagawa'
+-- vim.cmd 'colorscheme kanagawa'
+vim.cmd 'colorscheme vague'

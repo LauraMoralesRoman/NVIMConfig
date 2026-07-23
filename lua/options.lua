@@ -49,7 +49,10 @@ if vim.g.neovide then
   vim.g.neovide_scale_factor = 1.0
   vim.g.neovide_text_gamma = 0.9
   vim.g.neovide_text_contrast = 0.1
-  vim.g.neovide_fullscreen = true
+  vim.g.neovide_no_window_decorations = false
+  vim.keymap.set('n', '<F11>', function()
+    vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen
+  end)
   vim.g.neovide_opacity = 0.8
 end
 
