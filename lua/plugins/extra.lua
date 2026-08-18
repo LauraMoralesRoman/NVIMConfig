@@ -100,15 +100,27 @@ return {
       require('neotest').setup {
         adapters = {
           require('neotest-ctest').setup {},
-          require('neotest-zig') {
+          require 'neotest-zig' {
             dap = {
               adapter = 'lldb',
             },
           },
-          require('neotest-rust') {
+          require 'neotest-rust' {
             args = { '--no-capture' },
           },
         },
+      }
+    end,
+  },
+  {
+    'gl1tchc0d3r/typstwriter.nvim',
+    ft = { 'typst' },
+    cmd = {
+      'TypstWriter',
+    },
+    config = function()
+      require('typstwriter').setup {
+        -- Configuration options (see Configuration page)
       }
     end,
   },
