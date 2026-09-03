@@ -33,12 +33,5 @@ return {
     'nvim-treesitter/nvim-treesitter-context',
     event = { 'BufReadPost', 'BufNewFile' },
   },
-  {
-    'nvzone/timerly',
-    dependencies = 'nvzone/volt',
-    cmd = 'TimerlyToggle',
-    opts = {
-      position = 'top-right',
-    }, -- optional
-  },
+  { 'junegunn/vim-peekaboo' },
 }

@@ -45,6 +45,7 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true }) -- Exit terminal mode
 vim.keymap.set('n', '<C-c>', '<Esc>')
+vim.keymap.set('n', '<esc><esc>', ':cclose<cr>')
 
 -- Tools
 vim.keymap.set('n', '<leader>ss', '<cmd>source init.vim<CR>')
@@ -60,7 +61,7 @@ vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 local function open_in_tab_with_w3m()
-  if vim.fn.executable('w3m') == 0 then
+  if vim.fn.executable 'w3m' == 0 then
     vim.notify('w3m not found in PATH', vim.log.levels.WARN)
     return
   end

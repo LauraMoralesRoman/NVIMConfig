@@ -193,3 +193,74 @@ vim.api.nvim_create_user_command('LspRestart', function()
   end, 150)
 end, { desc = 'Restart LSP for current buffer' })
 
+------------------
+-- PDF managing --
+------------------
+
+local pdf_viewers = {}
+
+local function open_pdf(pdf)
+  pdf = vim.fn.fnamemodify(pdf, ':p')
+
+  if pdf_viewers[pdf] then
+    vim.notify('PDF already open: ' .. pdf)
+    return
+  end
+
+  local dir = vim.fn.fnamemodify(pdf, ':h')
+  local filename = vim.fn.fnamemodify(pdf, ':t')
+
+  local watcher = vim.uv.new_fs_event()
+
+  local process = vim.system({ 'mupdf', pdf }, {
+    detach = true,
+  }, function()
+    vim.schedule(function()
+      local entry = pdf_viewers[pdf]
+      if entry then
+        entry.watcher:stop()
+        entry.watcher:close()
+        pdf_viewers[pdf] = nil
+      end
+    end)
+  end)
+
+  pdf_viewers[pdf] = {
+    process = process,
+    watcher = watcher,
+  }
+
+  watcher:start(dir, {}, function(err, changed)
+    if err then
+      vim.schedule(function()
+        vim.notify('PDF watcher error: ' .. err, vim.log.levels.ERROR)
+      end)
+      return
+    end
+
+    if changed ~= filename then
+      return
+    end
+
+    vim.schedule(function()
+      local entry = pdf_viewers[pdf]
+
+      if entry then
+        local ok, err = pcall(function()
+          entry.process:kill 'sighup'
+        end)
+
+        if not ok then
+          vim.notify('Failed to reload PDF: ' .. err, vim.log.levels.ERROR)
+        end
+      end
+    end)
+  end)
+end
+
+vim.api.nvim_create_user_command('OpenPDF', function(opts)
+  open_pdf(opts.args)
+end, {
+  nargs = 1,
+  complete = 'file',
+})

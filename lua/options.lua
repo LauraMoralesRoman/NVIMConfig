@@ -16,6 +16,7 @@ vim.opt.splitbelow = true
 
 vim.opt.colorcolumn = '+1'
 -- vim.opt.textwidth = 80
+vim.opt.equalalways = false
 
 -- Formatting options
 vim.opt_global.shiftwidth = 4
@@ -24,6 +25,9 @@ vim.opt_global.expandtab = false
 vim.opt.wrap = false
 vim.opt.breakindent = true
 vim.opt.undofile = true
+
+vim.opt.showcmd = true
+vim.opt.showcmdloc = 'statusline'
 
 -- Graphical options
 vim.g.have_nerd_font = true
@@ -62,23 +66,8 @@ vim.api.nvim_set_hl(0, 'Pink', { fg = '#ff7be6', bold = true })
 vim.api.nvim_set_hl(0, 'Gray', { fg = '#525252', italic = true })
 
 -- Track session start time
-vim.g.session_start = vim.fn.localtime()
 
 -- Session time formatter - shows only the 2 most relevant units
-local function session_time()
-  local elapsed = vim.fn.localtime() - vim.g.session_start
-  local hours = math.floor(elapsed / 3600)
-  local minutes = math.floor((elapsed % 3600) / 60)
-  local seconds = elapsed % 60
-
-  if hours > 0 then
-    return string.format('%dh %dm', hours, minutes)
-  elseif minutes > 0 then
-    return string.format('%dm %ds', minutes, seconds)
-  else
-    return string.format('%ds', seconds)
-  end
-end
 -- Arglist filename - returns (filename) or empty
 local function arglist_fname()
   local argc = vim.fn.argc()
@@ -100,7 +89,6 @@ local function arglist_count()
 end
 
 -- Make it accessible from statusline
-_G.session_time = session_time
 _G.arglist_count = arglist_count
 _G.arglist_fname = arglist_fname
 
@@ -112,18 +100,26 @@ _G.lsp_progress_safe = function()
   return ''
 end
 
+function _G.recording_status()
+  local reg = vim.fn.reg_recording()
+  if reg == '' then
+    return ''
+  end
+  return '󰑖 @' .. reg
+end
+
 vim.opt.statusline = table.concat({
-  '%#Pink# Laura 󰄛 ',
+  '%#Pink# 󰄛  Laura 󰄛 ',
   '%#Normal# %f', -- file path
   '%m', -- modified flag
   ' %{v:lua.arglist_count()}', -- arglist counter [n/max]
   '%#Gray#%{v:lua.arglist_fname()}', -- (filename) in Gray/italic
   '%#Normal#', -- reset highlight
-  '%{v:lua.hermes_task_status()}', -- Hermes task progress
   '%=', -- right-align rest
+  '%S',
+  '%#Red#%{v:lua.recording_status()}%#Normal#',
   '%{v:lua.lsp_progress_safe()}', -- LSP progress
   '%l:%c %p%%', -- line:col and percent
-  '%#Gray# %{"[" . v:lua.session_time() . "] "}', -- ⏰ session time
 }, ' ')
 
 local timer = vim.loop.new_timer()

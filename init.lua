@@ -20,11 +20,9 @@ require('lazy').setup {
   require 'plugins.godot',
 }
 
-require 'hermes-bridge.init'
-require 'hermes-bridge.notify'
-
 require 'commands'
 require 'packages'
 
 -- vim.cmd 'colorscheme kanagawa'
+vim.o.background = 'dark'
 vim.cmd 'colorscheme vague'

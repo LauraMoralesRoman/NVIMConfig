@@ -41,3 +41,19 @@ vim.api.nvim_create_autocmd({ 'VimEnter', 'DirChanged' }, {
   end,
   desc = 'Source local init.vim or Session.vim on VimEnter/DirChanged',
 })
+
+-- Show the filename when in command mode
+
+vim.api.nvim_create_autocmd('CmdlineEnter', {
+  callback = function()
+    vim.o.winbar = ' %f '
+    vim.cmd 'redrawstatus'
+  end,
+})
+
+vim.api.nvim_create_autocmd('CmdlineLeave', {
+  callback = function()
+    vim.o.winbar = ''
+    vim.cmd 'redrawstatus'
+  end,
+})

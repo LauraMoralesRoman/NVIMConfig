@@ -2,12 +2,16 @@ return {
   {
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
+
     dependencies = {
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      'onsails/lspkind.nvim',
     },
+
     config = function()
       local cmp = require 'cmp'
+      local lspkind = require 'lspkind'
 
       cmp.setup {
         completion = {
@@ -23,14 +27,24 @@ return {
           ['<CR>'] = cmp.mapping.confirm { select = true },
           ['<C-Space>'] = cmp.mapping.complete {},
         },
+
         sources = {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
         },
+
+        formatting = {
+          fields = { 'icon', 'abbr' },
+
+          format = lspkind.cmp_format {
+            mode = 'symbol',
+          },
+        },
       }
     end,
   },
+
   {
     'neovim/nvim-lspconfig',
     dependencies = {

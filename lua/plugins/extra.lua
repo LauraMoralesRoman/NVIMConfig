@@ -113,15 +113,25 @@ return {
     end,
   },
   {
-    'gl1tchc0d3r/typstwriter.nvim',
-    ft = { 'typst' },
-    cmd = {
-      'TypstWriter',
+    'luckasRanarison/nvim-devdocs',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope.nvim',
+      'nvim-treesitter/nvim-treesitter',
     },
-    config = function()
-      require('typstwriter').setup {
-        -- Configuration options (see Configuration page)
-      }
-    end,
+    cmd = {
+      'DevdocsOpen',
+      'DevdocsFetch',
+      'DevdocsToggle',
+      'DevdocsUpdate',
+      'DevdocsInstall',
+      'DevdocsOpenFloat',
+      'DevdocsUninstall',
+      'DevdocsUpdataAll',
+      'DevdocsKeywordprg',
+      'DevdocsOpenCurrent',
+      'DevdocsOpenCurrentFloat',
+    },
+    opts = {},
   },
 }
