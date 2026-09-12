@@ -106,4 +106,5 @@ return {
       { '<Leader>-', '<cmd>Oil .<cr>', desc = 'Shows file explorer at the root directory' },
     },
   },
+  { 'LauraMoralesRoman/DevDocs' },
 }

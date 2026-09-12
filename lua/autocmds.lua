@@ -43,17 +43,26 @@ vim.api.nvim_create_autocmd({ 'VimEnter', 'DirChanged' }, {
 })
 
 -- Show the filename when in command mode
-
 vim.api.nvim_create_autocmd('CmdlineEnter', {
   callback = function()
     vim.o.winbar = ' %f '
-    vim.cmd 'redrawstatus'
+    vim.schedule(function()
+      vim.api.nvim__redraw {
+        winbar = true,
+        flush = true,
+      }
+    end)
   end,
 })
 
 vim.api.nvim_create_autocmd('CmdlineLeave', {
   callback = function()
     vim.o.winbar = ''
-    vim.cmd 'redrawstatus'
+    vim.schedule(function()
+      vim.api.nvim__redraw {
+        winbar = true,
+        flush = true,
+      }
+    end)
   end,
 })
