@@ -17,6 +17,7 @@ require('lazy').setup {
   require 'plugins.basic',
   require 'plugins.extra',
   require 'plugins.visual',
+  require 'plugins.animation',
   -- require 'plugins.godot',
 }
 
