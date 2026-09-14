@@ -179,11 +179,4 @@ return {
       require('lsp-progress').setup()
     end,
   },
-  {
-    'ray-x/lsp_signature.nvim',
-    event = 'InsertEnter',
-    opts = {
-      hint_enable = false, -- disable virtual text
-    },
-  },
 }

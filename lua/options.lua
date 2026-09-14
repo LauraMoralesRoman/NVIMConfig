@@ -109,7 +109,7 @@ function _G.recording_status()
 end
 
 vim.opt.statusline = table.concat({
-  '%#Pink# 󰄛  Laura 󰄛 ',
+  '%#Pink# 󰄛 Laura 󰄛 ',
   '%#Normal# %f', -- file path
   '%m', -- modified flag
   ' %{v:lua.arglist_count()}', -- arglist counter [n/max]
