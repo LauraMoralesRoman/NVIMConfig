@@ -1,121 +1,203 @@
 return {
   {
     'mfussenegger/nvim-dap',
-    dependencies = {
-      'mfussenegger/nvim-dap-ui',
-      'LiadOz/nvim-dap-repl-highlights',
-    },
-    event = 'VeryLazy',
-    config = function()
-      local dap = require 'dap'
-      local dapui = require 'dap-ui'
 
-      dapui.setup {
-        layouts = {
-          {
-            positions = { bottom = '40%' },
-            size = 40,
+    dependencies = {
+      {
+        'rcarriga/nvim-dap-ui',
+        dependencies = {
+          'nvim-neotest/nvim-nio',
+        },
+      },
+
+      {
+        'jay-babu/mason-nvim-dap.nvim',
+        dependencies = {
+          'williamboman/mason.nvim',
+        },
+        opts = {
+          ensure_installed = {
+            'python',
+            'bash',
           },
         },
-      }
+      },
+    },
 
-      -- codelldb covers C, C++, Rust (and Odin via nvim-dap-odin)
-      dap.adapters.codelldb = {
-        type = 'server',
-        port = '${port}',
-        executable = {
-          command = vim.env.CODELLDB_PATH or 'codelldb',
-          args = { '--port', '${port}' },
-        },
-      }
+    config = function()
+      local dap = require 'dap'
+      local dapui = require 'dapui'
 
-      -- Python via debugpy (install with: pip install debugpy)
-      dap.adapters.python = {
-        type = 'executable',
-        command = vim.env.PYDEBUGPY_PATH or vim.fn.exepath('python3'),
-        args = { '-m', 'debugpy.adapter' },
-      }
-
-      dap.configurations.c = {
-        {
-          name = 'Launch',
-          type = 'codelldb',
-          request = 'launch',
-          program = function()
-            return vim.fn.input('Path to executable: ', vim.current.buffer.name, 'file')
-          end,
-          cwd = '${workspaceFolder}',
-          stopOnEntry = false,
-          args = {},
-        },
-      }
-
-      dap.configurations.cpp = dap.configurations.c
-      dap.configurations.cs = dap.configurations.c
-
-      dap.configurations.rust = {
-        {
-          name = 'Launch',
-          type = 'codelldb',
-          request = 'launch',
-          program = function()
-            return vim.fn.input('Path to executable: ', vim.current.buffer.name, 'file')
-          end,
-          cwd = '${workspaceFolder}',
-          args = {},
-          stopOnEntry = false,
-          runInTerminal = false,
-        },
-      }
-
-      dap.configurations.python = {
-        {
-          type = 'python',
-          request = 'launch',
-          name = 'Launch file',
-          program = '${file}',
-          pythonPath = function()
-            local current = vim.fn.expand '%:p:h'
-            local candidates = {
-              current .. '/.venv/bin',
-              current .. '/venv/bin',
-              current .. '/.venv/bin',
-              os.getenv('HOME') .. '/.virtualenvs/bin',
-            }
-            for _, c in ipairs(candidates) do
-              local python = c .. '/python3'
-              if vim.fn.executable(python) == 1 then
-                return python
-              end
-            end
-            return 'python3'
-          end,
-        },
-      }
-
-      -- nvim-dap-odin registers its own Odin configurations (type = 'codelldb')
-      -- once installed; no manual config needed.
+      ---------------------------------------------------------------------------
+      -- DAP UI
+      ---------------------------------------------------------------------------
 
       dapui.setup()
 
-      -- Leader-d keybindings: <leader>d as prefix, never function keys
-      local keys = {
-        { '<leader>db', function() dap.toggle_breakpoint() end, desc = 'DAP Toggle Breakpoint' },
-        { '<leader>dB', function() dap.set_breakpoint() end, desc = 'DAP Set Breakpoint' },
-        { '<leader>dc', function() dap.continue() end, desc = 'DAP Continue' },
-        { '<leader>di', function() dap.step_in() end, desc = 'DAP Step In' },
-        { '<leader>do', function() dap.step_out() end, desc = 'DAP Step Out' },
-        { '<leader>dn', function() dap.step_over() end, desc = 'DAP Step Over' },
-        { '<leader>du', function() dapui.toggle() end, desc = 'DAP Toggle UI' },
-        { '<leader>dr', function() dap.repl.open() end, desc = 'DAP Open REPL' },
-        { '<leader>dR', function() dap.restart() end, desc = 'DAP Restart' },
-        { '<leader>dh', function() dapui.help() end, desc = 'DAP Help' },
+      dap.listeners.after.event_initialized['dapui_config'] = function()
+        dapui.open()
+      end
+
+      dap.listeners.before.event_terminated['dapui_config'] = function()
+        dapui.close()
+      end
+
+      dap.listeners.before.event_exited['dapui_config'] = function()
+        dapui.close()
+      end
+
+      ---------------------------------------------------------------------------
+      -- GDB
+      --
+      -- Requires GDB 14 or newer.
+      --
+      -- Check with:
+      --   gdb --version
+      ---------------------------------------------------------------------------
+
+      dap.adapters.gdb = {
+        type = 'executable',
+        command = 'gdb',
+        args = { '-i', 'dap' },
       }
 
-      -- Bind keymaps (the plugin is already loaded by the time config runs)
-      for _, k in ipairs(keys) do
-        vim.keymap.set('n', k[1], k[2], { desc = k.desc, noremap = true, silent = true })
-      end
+      ---------------------------------------------------------------------------
+      -- C / C++ / Rust
+      ---------------------------------------------------------------------------
+
+      local gdb_config = {
+        {
+          name = 'Launch',
+          type = 'gdb',
+          request = 'launch',
+
+          program = function()
+            return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          end,
+
+          cwd = '${workspaceFolder}',
+
+          stopAtBeginningOfMainSubprogram = false,
+
+          args = function()
+            local args = vim.fn.input 'Arguments: '
+
+            if args == '' then
+              return {}
+            end
+
+            return vim.split(args, ' ', {
+              trimempty = true,
+            })
+          end,
+        },
+      }
+
+      dap.configurations.c = vim.deepcopy(gdb_config)
+      dap.configurations.cpp = vim.deepcopy(gdb_config)
+      dap.configurations.rust = vim.deepcopy(gdb_config)
+
+      ---------------------------------------------------------------------------
+      -- Python
+      ---------------------------------------------------------------------------
+
+      dap.configurations.python = {
+        {
+          name = 'Python: Launch current file',
+          type = 'python',
+          request = 'launch',
+
+          program = '${file}',
+          cwd = '${workspaceFolder}',
+
+          console = 'integratedTerminal',
+
+          pythonPath = function()
+            local venv = os.getenv 'VIRTUAL_ENV'
+
+            if venv then
+              return venv .. '/bin/python'
+            end
+
+            return vim.fn.exepath 'python3'
+          end,
+        },
+      }
+
+      ---------------------------------------------------------------------------
+      -- Bash
+      ---------------------------------------------------------------------------
+
+      dap.configurations.sh = {
+        {
+          name = 'Bash: Launch current file',
+          type = 'bash',
+          request = 'launch',
+
+          program = '${file}',
+          cwd = '${fileDirname}',
+
+          terminalKind = 'integrated',
+        },
+      }
+
+      dap.configurations.bash = dap.configurations.sh
+
+      ---------------------------------------------------------------------------
+      -- Keymaps
+      ---------------------------------------------------------------------------
+
+      vim.keymap.set('n', '<leader>dc', function()
+        dap.continue()
+      end, { desc = 'DAP: Continue / Start' })
+
+      vim.keymap.set('n', '<leader>db', function()
+        dap.toggle_breakpoint()
+      end, { desc = 'DAP: Toggle breakpoint' })
+
+      vim.keymap.set('n', '<leader>do', function()
+        dap.step_over()
+      end, { desc = 'DAP: Step over' })
+
+      vim.keymap.set('n', '<leader>di', function()
+        dap.step_into()
+      end, { desc = 'DAP: Step into' })
+
+      vim.keymap.set('n', '<leader>du', function()
+        dap.step_out()
+      end, { desc = 'DAP: Step out' })
+
+      vim.keymap.set('n', '<leader>dt', function()
+        dap.terminate()
+      end, { desc = 'DAP: Terminate' })
+
+      vim.keymap.set('n', '<leader>dr', function()
+        dap.repl.open()
+      end, { desc = 'DAP: Open REPL' })
+
+      vim.keymap.set('n', '<leader>dd', function()
+        dapui.toggle()
+      end, { desc = 'DAP: Toggle DAP UI' })
+
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'dap-repl',
+        callback = function(args)
+          vim.bo[args.buf].omnifunc = "v:lua.require'dap.repl'.omnifunc"
+
+          vim.keymap.set('i', '<Tab>', function()
+            if vim.fn.pumvisible() == 1 then
+              return '<C-n>'
+            end
+
+            return '<C-x><C-o>'
+          end, {
+            buffer = args.buf,
+            expr = true,
+            replace_keycodes = true,
+            desc = 'DAP completion',
+          })
+        end,
+      })
     end,
   },
 }
