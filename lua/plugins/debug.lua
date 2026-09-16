@@ -3,7 +3,7 @@ return {
     'mfussenegger/nvim-dap',
     dependencies = {
       'mfussenegger/nvim-dap-ui',
-      'rcarriga/nvim-dap-repl-highlight',
+      'LiadOz/nvim-dap-repl-highlights',
     },
     event = 'VeryLazy',
     config = function()
