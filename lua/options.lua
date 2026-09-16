@@ -108,19 +108,83 @@ function _G.recording_status()
   return '󰑖 @' .. reg
 end
 
-vim.opt.statusline = table.concat({
-  '%#Pink# 󰄛 Laura 󰄛 ',
-  '%#Normal# %f', -- file path
-  '%m', -- modified flag
-  ' %{v:lua.arglist_count()}', -- arglist counter [n/max]
-  '%#Gray#%{v:lua.arglist_fname()}', -- (filename) in Gray/italic
-  '%#Normal#', -- reset highlight
-  '%=', -- right-align rest
-  '%S',
-  '%#Red#%{v:lua.recording_status()}%#Normal#',
-  '%{v:lua.lsp_progress_safe()}', -- LSP progress
-  '%l:%c %p%%', -- line:col and percent
-}, ' ')
+local pastel = {
+  Normal = { bg = '#F5ABB9', fg = '#000000' }, -- soft lavender
+  Insert = { bg = '#A8DCCB', fg = '#20382F' }, -- soft mint
+  Visual = { bg = '#F3C98B', fg = '#40301F' }, -- soft peach
+  Replace = { bg = '#E8A9B8', fg = '#402832' }, -- soft pink
+  Command = { bg = '#A9C4E8', fg = '#253448' }, -- soft blue
+  Terminal = { bg = '#9FD5E3', fg = '#24363D' }, -- soft cyan
+}
+
+local function set_statusline_colors()
+  for mode, colors in pairs(pastel) do
+    vim.api.nvim_set_hl(0, 'StatusLine' .. mode, {
+      fg = colors.fg,
+      bg = colors.bg,
+      bold = true,
+    })
+  end
+
+  vim.api.nvim_set_hl(0, 'StatusLineLaura', {
+    fg = '#000000',
+    bg = '#F5ABB9',
+    bold = true,
+  })
+end
+
+set_statusline_colors()
+
+local mode_map = {
+  n = { name = 'Normal', letter = 'N' },
+  i = { name = 'Insert', letter = 'I' },
+  v = { name = 'Visual', letter = 'V' },
+  V = { name = 'Visual', letter = 'V' },
+  ['\22'] = { name = 'Visual', letter = 'V' },
+  R = { name = 'Replace', letter = 'R' },
+  c = { name = 'Command', letter = 'C' },
+  t = { name = 'Terminal', letter = 'T' },
+  s = { name = 'Visual', letter = 'S' },
+  S = { name = 'Visual', letter = 'S' },
+}
+
+function _G.my_statusline()
+  local mode = mode_map[vim.fn.mode(1)] or mode_map.n
+  local mode_hl = '%#StatusLine' .. mode.name .. '#'
+
+  return table.concat({
+    mode_hl,
+    '  ' .. mode.letter .. '  ',
+    '%#StatusLineLaura#  󰄛 Laura 󰄛 ',
+    mode_hl,
+    '  ',
+    '%f',
+    '%m',
+    ' %{v:lua.arglist_count()}',
+    ' %{v:lua.arglist_fname()}',
+    '%=',
+    '%S',
+    '%{v:lua.recording_status()}',
+    '%{v:lua.lsp_progress_safe()}',
+    '%l:%c %p%%',
+  }, ' ')
+end
+
+vim.opt.statusline = '%!v:lua.my_statusline()'
+
+vim.api.nvim_create_autocmd('ModeChanged', {
+  callback = function()
+    vim.defer_fn(function()
+      vim.cmd 'redrawstatus'
+    end, 10)
+  end,
+})
+
+vim.api.nvim_create_autocmd('ColorScheme', {
+  callback = function()
+    vim.defer_fn(set_statusline_colors, 10)
+  end,
+})
 
 local timer = vim.loop.new_timer()
 timer:start(

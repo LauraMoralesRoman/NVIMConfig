@@ -42,11 +42,17 @@ return {
         ),
       })
 
-      local horizontal_renderer = wilder.wildmenu_renderer {
+      local vertical_renderer = wilder.popupmenu_renderer {
         highlighter = wilder.lua_fzy_highlighter(),
-        separator = ' · ',
-        left = { ' ', wilder.wildmenu_spinner(), ' ' },
-        right = { ' ', wilder.wildmenu_index() },
+        left = {
+          ' ',
+          wilder.popupmenu_devicons(),
+          ' ',
+        },
+        right = {
+          ' ',
+          wilder.popupmenu_scrollbar(),
+        },
       }
 
       local search_renderer = wilder.wildmenu_renderer {
@@ -59,7 +65,7 @@ return {
       wilder.set_option(
         'renderer',
         wilder.renderer_mux {
-          [':'] = horizontal_renderer, -- vertical popupmenu with icons
+          [':'] = vertical_renderer, -- vertical popupmenu with icons
           ['/'] = search_renderer, -- horizontal for search
           ['?'] = search_renderer,
         }

@@ -17,6 +17,7 @@ require('lazy').setup {
   require 'plugins.basic',
   require 'plugins.extra',
   require 'plugins.visual',
+  require 'plugins.debug',
   require 'plugins.animation',
   -- require 'plugins.godot',
 }
@@ -26,4 +27,17 @@ require 'packages'
 
 -- vim.cmd 'colorscheme kanagawa'
 vim.o.background = 'dark'
-vim.cmd 'colorscheme vague'
+vim.cmd 'colorscheme catppuccin'
+
+-- Compatibility for older Kitty versions
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    io.stdout:write '\027[>1u'
+  end,
+})
+
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  callback = function()
+    io.stdout:write '\027[<1u'
+  end,
+})

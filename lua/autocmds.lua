@@ -46,6 +46,7 @@ vim.api.nvim_create_autocmd({ 'VimEnter', 'DirChanged' }, {
 vim.api.nvim_create_autocmd('CmdlineEnter', {
   callback = function()
     vim.o.winbar = ' %f '
+    vim.o.cmdheight = 1
     vim.schedule(function()
       vim.api.nvim__redraw {
         winbar = true,
@@ -58,6 +59,7 @@ vim.api.nvim_create_autocmd('CmdlineEnter', {
 vim.api.nvim_create_autocmd('CmdlineLeave', {
   callback = function()
     vim.o.winbar = ''
+    vim.o.cmdheight = 0
     vim.schedule(function()
       vim.api.nvim__redraw {
         winbar = true,

@@ -34,4 +34,9 @@ return {
     event = { 'BufReadPost', 'BufNewFile' },
   },
   { 'junegunn/vim-peekaboo' },
+  {
+    'chentoast/marks.nvim',
+    event = 'VeryLazy',
+    opts = {},
+  },
 }
