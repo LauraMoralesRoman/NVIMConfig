@@ -45,7 +45,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('t', '<C-space>', '<C-\\><C-n>', { silent = true }) -- Exit terminal mode
 vim.keymap.set('n', '<C-c>', '<Esc>')
-vim.keymap.set('n', '<esc><esc>', ':cclose<cr> :lclose<cr> :noh<cr>')
+vim.keymap.set('n', '<esc><esc>', ':cclose<cr> :lclose<cr> :noh<cr>', { silent = true })
+
+vim.keymap.set('n', '<C-A-O>', 'g;')
+vim.keymap.set('n', '<C-A-I>', 'g,')
 
 -- Tools
 vim.keymap.set('n', '<leader>ss', '<cmd>source init.vim<CR>')
