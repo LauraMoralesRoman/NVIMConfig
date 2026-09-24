@@ -142,56 +142,160 @@ end, { desc = 'Toggle quickfix/loclist cursor follow' })
 -- LSP management commands
 -- (nvim-lspconfig built-ins may not always register; these are explicit fallbacks)
 
+local function get_buf_clients(bufnr)
+  return vim.lsp.get_clients { bufnr = bufnr }
+end
+
+local function client_names(clients)
+  local names = {}
+
+  for _, client in ipairs(clients) do
+    table.insert(names, client.name)
+  end
+
+  return names
+end
+
+local function start_lsp(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return false
+  end
+
+  -- Si ya hay un cliente, no hacemos nada.
+  local clients = get_buf_clients(bufnr)
+
+  if #clients > 0 then
+    return true
+  end
+
+  -- Ejecutamos FileType para permitir que lspconfig/vim.lsp
+  -- vuelva a evaluar la configuración del buffer.
+  vim.api.nvim_exec_autocmds('FileType', {
+    buffer = bufnr,
+    modeline = false,
+  })
+
+  return true
+end
+
 vim.api.nvim_create_user_command('LspStart', function()
   local bufnr = vim.api.nvim_get_current_buf()
-  local clients = vim.lsp.get_clients { bufnr = bufnr }
+
+  local clients = get_buf_clients(bufnr)
+
   if #clients > 0 then
-    vim.notify('LSP already attached: ' .. clients[1].name, vim.log.levels.INFO)
+    vim.notify('LSP already attached: ' .. table.concat(client_names(clients), ', '), vim.log.levels.INFO)
     return
   end
-  vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, group = 'lspconfig', modeline = false })
+
+  start_lsp(bufnr)
+
   vim.defer_fn(function()
-    local new = vim.lsp.get_clients { bufnr = bufnr }
-    if #new > 0 then
-      vim.notify('LSP started: ' .. new[1].name, vim.log.levels.INFO)
+    if not vim.api.nvim_buf_is_valid(bufnr) then
+      return
+    end
+
+    local new_clients = get_buf_clients(bufnr)
+
+    if #new_clients > 0 then
+      vim.notify('LSP started: ' .. table.concat(client_names(new_clients), ', '), vim.log.levels.INFO)
     else
       local ft = vim.bo[bufnr].filetype
-      vim.notify('No LSP configured for filetype: ' .. ft, vim.log.levels.WARN)
+
+      vim.notify('No LSP attached for filetype: ' .. (ft ~= '' and ft or '<none>'), vim.log.levels.WARN)
     end
-  end, 300)
-end, { desc = 'Start LSP for current buffer' })
+  end, 500)
+end, {
+  desc = 'Start LSP for current buffer',
+})
 
 vim.api.nvim_create_user_command('LspStop', function(opts)
   local bufnr = vim.api.nvim_get_current_buf()
-  local clients = vim.lsp.get_clients { bufnr = bufnr }
+  local clients = get_buf_clients(bufnr)
+
+  if #clients == 0 then
+    vim.notify('No LSP clients attached', vim.log.levels.WARN)
+    return
+  end
+
+  local names = client_names(clients)
+
   for _, client in ipairs(clients) do
     client.stop(opts.bang)
   end
-  if #clients > 0 then
-    vim.notify('Stopped ' .. #clients .. ' LSP client(s)', vim.log.levels.INFO)
-  else
-    vim.notify('No LSP clients attached', vim.log.levels.WARN)
-  end
-end, { bang = true, desc = 'Stop LSP for current buffer' })
+
+  vim.notify('Stopping LSP: ' .. table.concat(names, ', '), vim.log.levels.INFO)
+end, {
+  bang = true,
+  desc = 'Stop LSP for current buffer',
+})
 
 vim.api.nvim_create_user_command('LspRestart', function()
   local bufnr = vim.api.nvim_get_current_buf()
-  local clients = vim.lsp.get_clients { bufnr = bufnr }
-  local names = {}
+  local clients = get_buf_clients(bufnr)
+
+  if #clients == 0 then
+    vim.notify('No LSP clients attached; starting LSP instead', vim.log.levels.INFO)
+
+    start_lsp(bufnr)
+    return
+  end
+
+  local names = client_names(clients)
+
   for _, client in ipairs(clients) do
-    table.insert(names, client.name)
     client.stop()
   end
-  vim.defer_fn(function()
-    vim.api.nvim_exec_autocmds('FileType', { buffer = bufnr, modeline = false })
-    vim.defer_fn(function()
-      local new = vim.lsp.get_clients { bufnr = bufnr }
-      if #new > 0 then
-        vim.notify('LSP restarted: ' .. table.concat(names, ', '), vim.log.levels.INFO)
+
+  -- Esperamos a que los clientes realmente desaparezcan.
+  local function wait_for_stop()
+    if not vim.api.nvim_buf_is_valid(bufnr) then
+      return
+    end
+
+    local remaining = get_buf_clients(bufnr)
+
+    if #remaining > 0 then
+      vim.defer_fn(wait_for_stop, 50)
+      return
+    end
+
+    -- Ahora sí volvemos a activar la configuración LSP.
+    start_lsp(bufnr)
+
+    -- Esperamos a que aparezca el nuevo cliente.
+    local attempts = 0
+
+    local function wait_for_start()
+      if not vim.api.nvim_buf_is_valid(bufnr) then
+        return
       end
-    end, 300)
-  end, 150)
-end, { desc = 'Restart LSP for current buffer' })
+
+      local new_clients = get_buf_clients(bufnr)
+
+      if #new_clients > 0 then
+        vim.notify('LSP restarted: ' .. table.concat(client_names(new_clients), ', '), vim.log.levels.INFO)
+        return
+      end
+
+      attempts = attempts + 1
+
+      -- ~5 segundos máximo.
+      if attempts >= 100 then
+        vim.notify('LSP failed to restart: ' .. table.concat(names, ', '), vim.log.levels.ERROR)
+        return
+      end
+
+      vim.defer_fn(wait_for_start, 50)
+    end
+
+    wait_for_start()
+  end
+
+  wait_for_stop()
+end, {
+  desc = 'Restart LSP for current buffer',
+})
 
 ------------------
 -- PDF managing --
