@@ -3,6 +3,11 @@ return {
     'nvim-mini/mini.animate',
     version = false,
     event = 'VeryLazy',
+    condition = function()
+      -- mini.animate's smooth scrolling conflicts with Neovide's rendering;
+      -- only enable it in the terminal (Neovide sets the NEOVIDE env var).
+      return vim.env.NEOVIDE == nil
+    end,
 
     opts = function()
       local animate = require 'mini.animate'
