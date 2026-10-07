@@ -108,7 +108,6 @@ return {
     },
   },
   {
-<<<<<<< HEAD
     'folke/todo-comments.nvim',
     dependencies = { 'nvim-lua/plenary.nvim' },
     opts = {
@@ -116,7 +115,6 @@ return {
       -- or leave it empty to use the default settings
       -- refer to the configuration section below
     },
-=======
     'jbyuki/venn.nvim',
     config = function()
       -- venn.nvim: enable or disable keymappings
@@ -145,6 +143,5 @@ return {
       -- toggle keymappings for venn using <leader>v
       vim.api.nvim_set_keymap('n', '<leader>v', ':lua Toggle_venn()<CR>', { noremap = true })
     end,
->>>>>>> 8b28090c49ccb035616caea592ed764209924ff4
   },
 }
