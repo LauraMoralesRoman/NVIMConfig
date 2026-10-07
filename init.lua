@@ -27,7 +27,7 @@ require 'packages'
 
 -- vim.cmd 'colorscheme kanagawa'
 vim.o.background = 'dark'
-vim.cmd 'colorscheme catppuccin'
+vim.cmd 'colorscheme oxocarbon'
 
 -- Compatibility for older Kitty versions
 vim.api.nvim_create_autocmd('VimEnter', {
